@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE111 Lab 3: Constructor &amp; Overloading (Guide + Tracing Lab)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ef; --paper:#fffdf8; --ink:#1d2433; --muted:#5b6475; --line:#e3ddd0;
+  --accent:#d9480f; --accent2:#0b7a75; --blue:#1c4fa0; --gold:#f2b705;
+  --code:#141a26; --codeink:#e6e9f0;
+  --sans:"Hind Siliguri","Segoe UI",system-ui,sans-serif; --mono:"JetBrains Mono",Consolas,monospace; --disp:"Space Grotesk","Hind Siliguri",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.7}
+code{font-family:var(--mono);font-size:.88em;background:#efe9dc;padding:1px 5px;border-radius:4px}
+a{color:var(--blue)}
+/* hero */
+.hero{background:var(--code);color:#fff;padding:56px 24px 48px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:
+ repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 48px),
+ repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 48px)}
+.hero-in{max-width:1180px;margin:0 auto;position:relative}
+.tag{display:inline-block;font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;color:var(--gold);border:1px solid rgba(242,183,5,.5);padding:3px 10px;border-radius:99px}
+.hero h1{font-family:var(--disp);font-size:clamp(30px,5vw,54px);line-height:1.08;margin:16px 0 12px;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p{color:#c7cede;max-width:720px;margin:0 0 22px}
+.hero-links{display:flex;flex-wrap:wrap;gap:10px}
+.hero-links a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:7px 14px;border-radius:8px;font-size:15px}
+.hero-links a.main{background:var(--accent);border-color:var(--accent);font-weight:600}
+/* layout */
+.wrap{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:230px 1fr;gap:34px;padding:30px 24px 80px}
+.toc{position:sticky;top:16px;align-self:start;font-size:14.5px;max-height:calc(100vh - 32px);overflow:auto}
+.toc .th{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin:16px 0 6px}
+.toc a{display:block;color:var(--ink);text-decoration:none;padding:3px 10px;border-left:2px solid var(--line)}
+.toc a:hover{background:#efe9dc}
+.toc a.act{border-left-color:var(--accent);color:var(--accent);font-weight:600}
+.toc a.lablink{margin-top:14px;background:var(--accent2);color:#fff;border-radius:8px;border:0;padding:8px 12px;font-weight:600}
+main{min-width:0}
+section{margin-bottom:56px}
+h2{font-family:var(--disp);font-size:32px;letter-spacing:-.01em;margin:10px 0 18px;padding-bottom:10px;border-bottom:3px solid var(--ink)}
+h2 .num{font-family:var(--mono);color:var(--accent);font-size:.6em;vertical-align:middle;margin-right:8px}
+h3{font-family:var(--disp);font-size:23px;margin:0 0 14px}
+h4{margin:18px 0 8px;font-size:17px}
+.lead{font-size:17.5px;color:#39404e}
+/* concept cards */
+.concept{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0 16px}
+.pill-card{background:#f3efe6;border-radius:10px;padding:12px 14px;font-size:15px}
+.rule{background:#fff6ec;border-left:4px solid var(--accent);padding:4px 16px;border-radius:0 10px 10px 0}
+.rule ul{padding-left:20px}
+.warn{background:#fff1ee;border:1px solid #f4c6b8;padding:12px 14px;border-radius:10px}
+.tip{background:#e9f6f4;border:1px solid #b9e2dc;padding:12px 14px;border-radius:10px}
+table.mini{border-collapse:collapse;font-size:15px;margin:8px 0;width:100%}
+table.mini th,table.mini td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+table.mini th{background:#efe9dc}
+.tips{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:12px 0}
+.tipc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px 14px 10px;font-size:15px}
+.tipc h4{margin:10px 0 4px}
+.tipc p{margin:0}
+/* tasks */
+.task{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px;margin:22px 0;box-shadow:0 1px 0 var(--line)}
+.blk{border-radius:12px;padding:12px 18px;margin:12px 0}
+.blk-h{font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;font-family:var(--disp)}
+.blk.q{background:#f1f4fb;border:1px solid #d5ddef}.blk.q .blk-h{color:var(--blue)}
+.blk.e{background:#fff7e8;border:1px solid #f1dfb7}.blk.e .blk-h{color:#a15c00}
+.blk.s{background:#eef8f5;border:1px solid #c5e6de}.blk.s .blk-h{color:var(--accent2)}
+.blk ul{padding-left:22px;margin:6px 0}
+details{margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--muted);font-size:15px}
+/* code */
+.codewrap{position:relative;margin:10px 0}
+.code-title{font-family:var(--mono);font-size:12px;color:#9aa4b8;background:#0d121b;padding:6px 14px;border-radius:10px 10px 0 0}
+.code-title + .copy-btn + pre, .code-title + pre{border-radius:0 0 10px 10px}
+pre{margin:0}
+pre.java{background:var(--code);color:var(--codeink);padding:14px 16px;border-radius:10px;overflow:auto;font-size:13.5px;line-height:1.6}
+pre.java code{background:none;padding:0;font-size:inherit;color:inherit}
+.copy-btn{position:absolute;right:8px;top:4px;font-size:12px;background:#2a3346;color:#cfd6e4;border:0;border-radius:6px;padding:3px 10px;cursor:pointer;z-index:2}
+.tk-k{color:#ff9e64}.tk-s{color:#9ece6a}.tk-n{color:#e0af68}.tk-c{color:#6b7591;font-style:italic}.tk-f{color:#7dcfff}
+pre.output{background:#0f1720;color:#b8f7c4;padding:12px 16px;border-radius:10px;font-family:var(--mono);font-size:13px;overflow:auto;line-height:1.55}
+/* trace */
+.tracecode{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin:8px 0 6px}
+.tc-h{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px}
+.numcode{background:var(--code);color:var(--codeink);border-radius:10px;padding:8px 0;font-family:var(--mono);font-size:12.8px;line-height:1.55;overflow:auto;max-height:520px}
+.ln{display:flex;white-space:pre;padding:0 10px 0 0}
+.ln .no{width:34px;flex:none;text-align:right;padding-right:10px;color:#5d6780;user-select:none}
+.ln.on{background:rgba(242,183,5,.22);box-shadow:inset 3px 0 0 var(--gold)}
+.hint{font-size:14px;color:var(--muted);margin:0 0 8px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:640px}
+table.trace{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+table.trace th{position:sticky;top:0;background:var(--ink);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:13px;z-index:1}
+table.trace td{border-bottom:1px solid #eee7da;padding:7px 10px;vertical-align:top}
+table.trace tr:nth-child(even) td{background:#fbf9f4}
+.c-n{color:var(--muted);font-family:var(--mono);font-size:12px}
+.c-l{font-family:var(--mono);font-size:12px;white-space:nowrap;color:var(--blue)}
+.c-code{min-width:190px;max-width:230px}.c-code code{background:var(--code);color:var(--codeink);white-space:pre-wrap;word-break:break-word;display:inline-block;font-size:12px}
+.c-o{width:1%;white-space:nowrap}.c-ch{max-width:240px;min-width:180px}.task .numcode{max-height:none}
+.c-ch{font-family:var(--mono);font-size:12.3px}
+.c-note{min-width:250px;font-size:14px}
+.ch-loc{color:#7a4cc2}.ch-fld{color:var(--accent);font-weight:600}.ch-new{color:var(--accent2);font-weight:600}.ch-call{color:var(--blue);font-weight:600}.ch-ret{color:#888}
+.outpill{background:#0f1720;color:#b8f7c4;font-family:var(--mono);font-size:12.5px;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.final{display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;margin-top:10px}
+table.outgrid{border-collapse:collapse;font-family:var(--mono)}
+table.outgrid td{border:2px solid var(--ink);min-width:62px;height:34px;text-align:center;font-weight:600;background:#fff}
+.btn{font-family:var(--sans);font-size:15px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent2);color:#fff;border-color:var(--accent2);font-weight:600}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+/* LAB */
+#lab{background:#10151f;color:#e8ecf3;border-radius:22px;padding:28px;margin-top:20px}
+#lab h2{color:#fff;border-color:var(--gold)}
+#lab .lead{color:#b7c0d1}
+.lab-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#1a2130;border-radius:12px;padding:10px 12px;margin-bottom:14px;position:sticky;top:8px;z-index:5}
+.lab-bar select{font-family:var(--sans);font-size:15px;padding:7px 10px;border-radius:8px;background:#0f1520;color:#fff;border:1px solid #344058}
+.lab-bar .btn{background:#26304a;color:#e8ecf3;border-color:#344058}
+.lab-bar .btn.primary{background:var(--gold);color:#111;border-color:var(--gold)}
+#labCount{font-family:var(--mono);font-size:13px;color:var(--gold);min-width:110px}
+#labRange{flex:1;min-width:140px;accent-color:var(--gold)}
+.lab-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
+.panel{background:#161d2b;border:1px solid #273148;border-radius:14px;padding:12px 14px;min-width:0}
+.panel-h{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#8d99b3;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+#lab .numcode{max-height:330px;background:#0c1018}
+#labNote{background:#232c40;border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:12px 16px;min-height:96px;font-size:15.5px;margin-bottom:14px}
+#labNote code{background:#0c1018;color:#e6e9f0}
+#labNote b{color:var(--gold)}
+.note-line{font-size:13px;color:#9aa6bf;margin-bottom:4px}
+.tiny{font-size:12.5px;color:#8d99b3}
+.frame,.hobj{background:#0f1520;border:1px solid #2c3750;border-radius:10px;margin-bottom:8px;overflow:hidden}
+.frame.top{border-color:var(--gold)}
+.fh{background:#1e273a;padding:5px 10px;font-family:var(--mono);font-size:12.5px;color:#cdd6e8}
+.badge{background:var(--gold);color:#111;font-size:10.5px;padding:1px 6px;border-radius:99px;margin-left:6px}
+.vr{display:flex;justify-content:space-between;padding:3px 10px;font-family:var(--mono);font-size:13px;border-top:1px solid #1f283a}
+.vr span:last-child{color:#9ece6a;font-weight:600}
+.vr.empty{color:#66728c;justify-content:center;font-family:var(--sans)}
+.arr{display:flex;gap:4px;padding:8px 10px;flex-wrap:wrap}
+.cell{border:1px solid #3a4865;min-width:44px;text-align:center;font-family:var(--mono);padding:2px 6px 3px;border-radius:6px;position:relative;color:#9ece6a;font-weight:600}
+.cell .idx{display:block;font-size:10px;color:#6b7896;font-weight:400}
+.flash{animation:fl 1.2s ease}
+.vr.flash,.cell.flash{background:rgba(242,183,5,.25)}
+@keyframes fl{0%{box-shadow:0 0 0 3px rgba(242,183,5,.8)}100%{box-shadow:0 0 0 0 rgba(242,183,5,0)}}
+#labOut{background:#06090f;border-radius:10px;padding:10px 14px;font-family:var(--mono);font-size:14px;color:#b8f7c4;min-height:120px}
+#labOut .newout{background:rgba(184,247,196,.15);border-radius:4px}
+#labOut .muted{color:#4f5b73}
+.hidden-out #labOut{filter:blur(7px);user-select:none}
+.side-stack{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.practice{margin-top:14px}
+.practice textarea{width:100%;min-height:120px;background:#06090f;color:#e8ecf3;border:1px solid #344058;border-radius:10px;padding:10px;font-family:var(--mono);font-size:14px}
+.practice .btn{background:#26304a;color:#e8ecf3;border-color:#344058}
+.practice .btn.primary{background:var(--accent2);border-color:var(--accent2)}
+.score{margin:10px 0 6px;font-weight:600}
+.ptab{border-collapse:collapse;font-family:var(--mono);font-size:13px}
+.ptab td,.ptab th{border:1px solid #2c3750;padding:4px 10px}
+.ptab tr.ok td{color:#9ece6a}.ptab tr.bad td{color:#ff8a80}
+.kbd{font-family:var(--mono);background:#26304a;border-radius:4px;padding:0 6px;font-size:12px}
+footer{text-align:center;color:var(--muted);font-size:14px;padding:30px}
+@media (max-width:1000px){
+  .wrap{grid-template-columns:1fr}.toc{display:none}
+  .grid2,.tracecode,.lab-grid,.side-stack{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr}
+  #lab{padding:16px;border-radius:14px}
+}
+
+@media print{
+  @page{size:A4;margin:12mm 10mm}
+  body{background:#fff;font-size:12.5px;line-height:1.55}
+  .toc,#lab,.hero-links,.copy-btn,.final-act,footer{display:none!important}
+  .wrap{display:block;padding:0;max-width:none}
+  .hero{padding:22px 18px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hero h1{font-size:30px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  section{margin-bottom:10px}
+  h2{font-size:22px;break-after:avoid}
+  .task{box-shadow:none;padding:12px 14px;border-radius:8px;margin:14px 0}
+  .task h3{break-after:avoid}
+  .concept{padding:12px 16px}
+  pre.java,.numcode,.code-title{background:#f6f4ee!important;color:#1d2433!important;border:1px solid #ddd6c6}
+  .ln .no{color:#9a9384}
+  .tk-k{color:#b4400a}.tk-s{color:#2e7d32}.tk-n{color:#9a6700}.tk-c{color:#888}.tk-f{color:#1c4fa0}
+  pre.output{background:#f1f8f2!important;color:#14532d!important;border:1px solid #c8e3cc}
+  .c-code{display:none}
+  table.trace th:nth-child(3){display:none}
+  .c-ch{max-width:none;min-width:170px}
+  .outpill{background:#e8f5e9;color:#14532d;border:1px solid #9cc9a3}
+  .hero{background:#1d2433!important}
+  .blk{break-inside:auto}
+  pre.java,pre.output{white-space:pre-wrap;word-break:break-word;font-size:11px;overflow:visible}
+  .numcode,.tablewrap,.task .numcode{max-height:none!important;overflow:visible!important}
+  .numcode{font-size:10.5px}
+  .tracecode{grid-template-columns:1.3fr 1fr}
+  table.trace{font-size:10.5px}
+  table.trace th{position:static}
+  table.trace tr{break-inside:avoid}
+  .c-code{min-width:0;max-width:150px}.c-code code{font-size:9.5px}
+  .c-ch{font-size:9.5px;min-width:0;max-width:150px}
+  .c-note{min-width:0;font-size:10.5px}
+  .outpill{font-size:9.5px}
+  .final{break-inside:avoid}
+  .grid2{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-in">
+  <span class="tag">CSE111 · PROGRAMMING LANGUAGE II · LAB 03</span>
+  <h1>Constructor, <em>Overloading</em><br>&amp; Tracing: পুরো গাইড</h1>
+  <p>Basic concept বাংলা + English mix-এ, তারপর assignment-এর প্রতিটা problem: question → হালকা explanation → solution। Tracing task-এ step-by-step trace table, আর শেষে interactive <b>Tracing Lab</b>। সব solution driver code চালিয়ে output মিলিয়ে দেখা হয়েছে।</p>
+  <div class="hero-links">
+    <a href="#basics">📘 Basics</a><a href="#classwork">🧪 Classwork</a><a href="#homework">🏠 Homework</a><a href="#ungraded">⭐ Ungraded</a><a class="main" href="#lab">▶ Tracing Lab</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+<nav class="toc">
+  <div class="th">Basics</div>
+  <a href="#basics">Constructor ও Overloading</a>
+  <a href="#b-this">this ও Shadowing</a>
+  <a href="#b-moverload">Method Overloading</a>
+  <a href="#b-tips">Tracing cheat-sheet</a>
+  <div class="th">Classwork</div>
+  <a href="#cw1">T1 · Shape</a><a href="#cw2">T2 · Shape2D</a><a href="#cw3">T3 · Library</a><a href="#cw4">T4 · TaxiLagbe</a><a href="#cw5">T5 · Tracing</a>
+  <div class="th">Homework</div>
+  <a href="#hw1">T1 · Toy</a><a href="#hw2">T2 · Cart</a><a href="#hw3">T3 · Reader</a><a href="#hw4">T4 · MoneyTracker</a><a href="#hw5">T5 · Tracing</a><a href="#hw6">T6 · Tracing (Maze)</a>
+  <div class="th">Ungraded</div>
+  <a href="#ug1">T1 · Customer</a><a href="#ug2">T2 · Student</a><a href="#ug3">T3 · Calculator</a><a href="#ug4">T4 · Book</a><a href="#ug5">T5 · Movie</a><a href="#ug6">T6 · Tracing</a>
+  <a class="lablink" href="#lab">▶ Tracing Lab</a>
+</nav>
+
+<main>
+
+<section id="basics"><h2><span class="num">01</span> Basics: Constructor &amp; Overloading</h2><p class="lead">Assignment-এর সব task দুইটা idea-র উপর: <b>Constructor (overloading সহ)</b> আর <b>Method Overloading</b>। আগে এগুলো পরিষ্কার করে নিই, তারপর tracing-এর কিছু ফাঁদ (trap) দেখব, যেগুলো exam-এ বারবার আসে।</p>
+
+<div class="concept" id="b-constructor">
+<h3>1. Constructor কী?</h3>
+<p><b>Constructor</b> একটা special method, যেটা <code>new</code> দিয়ে object তৈরি করার মুহূর্তে <b>automatically</b> call হয়। এর কাজ object-এর field গুলোতে শুরুর value বসানো (initialize করা)।</p>
+<div class="grid2">
+<div class="rule"><h4>📏 Rules</h4><ul>
+<li>নাম হুবহু <b>class-এর নামের</b> মতো হবে।</li>
+<li>কোনো <b>return type নেই</b>, <code>void</code>-ও লেখা যাবে না।</li>
+<li>নিজে আলাদা করে call করা যায় না, <code>new</code> লিখলেই চলে।</li>
+<li>Constructor body চলার <b>আগে</b> field-এর initial value (যেমন <code>int z = 5;</code>) বসে যায়।</li></ul></div>
+<div>
+<div class="codewrap"><div class="code-title">Example</div><pre class="java"><code>public class Toy {
+    public String name;
+    public int price;
+
+    public Toy(String name, int price) {   // constructor
+        this.name = name;
+        this.price = price;
+        System.out.println("A new toy has been made!");
+    }
+}
+// main-এ:
+Toy t1 = new Toy("Car", 230);  // constructor auto call</code></pre></div></div>
+</div>
+</div>
+
+<div class="concept">
+<h3>2. Default constructor vs Parameterized constructor</h3>
+<div class="grid2">
+<div><p><b>Default constructor:</b> তুমি class-এ <b>একটাও</b> constructor না লিখলে Java নিজে থেকে একটা খালি no-argument constructor দিয়ে দেয়। তখন field গুলো <b>default value</b> পায়।</p>
+<table class="mini"><tr><th>Type</th><th>Default value</th></tr>
+<tr><td>int, long</td><td>0</td></tr><tr><td>double</td><td>0.0</td></tr><tr><td>boolean</td><td>false</td></tr><tr><td>String / any object / array</td><td>null</td></tr></table></div>
+<div><p class="warn">⚠️ <b>Important:</b> তুমি যদি <b>কোনো একটা</b> parameterized constructor লেখো, Java আর default constructor দেয় না। তখন <code>new Toy()</code> লিখলে <b>compile error</b> হবে। দুটোই লাগলে no-arg constructor-টাও নিজে লিখতে হবে।</p>
+<p>HW Task 5-এর class A-তে কোনো constructor নেই, তাই default constructor চলে, আর <code>x, y</code> = 0।</p></div>
+</div>
+</div>
+
+<div class="concept" id="b-coverload">
+<h3>3. Constructor Overloading</h3>
+<p>একই class-এ <b>একাধিক constructor</b>, প্রত্যেকটার <b>parameter list আলাদা</b>। <code>new</code>-এর সাথে যে argument দেবে, Java সেটা দেখে ঠিক constructor বেছে নেয়।</p>
+<div class="codewrap"><div class="code-title">Example (Classwork Task 2, Task 4-এর মতো)</div><pre class="java"><code>public class TaxiLagbe {
+    public String number, area;
+
+    public TaxiLagbe(String number, String area) {   // version 1
+        this.number = number;
+        this.area = area;
+    }
+    public TaxiLagbe(String number) {                // version 2
+        this(number, "Khulna");   // constructor chaining → version 1 call
+    }
+}
+new TaxiLagbe("1010-01", "Dhaka");  // → version 1
+new TaxiLagbe("1010-02");           // → version 2 → area = "Khulna"</code></pre></div>
+<p><b><code>this(...)</code></b> দিয়ে এক constructor থেকে আরেকটা call করা যায় (<b>constructor chaining</b>)। এটা সবসময় constructor-এর <b>প্রথম statement</b> হতে হবে।</p>
+</div>
+
+<div class="concept" id="b-this">
+<h3>4. <code>this</code> keyword আর Shadowing (tracing-এর জন্য সবচেয়ে জরুরি!)</h3>
+<p>Method বা constructor-এর ভেতরে যদি কোনো <b>local variable বা parameter</b>-এর নাম field-এর নামের সাথে মিলে যায়, তাহলে শুধু নাম লিখলে <b>local/parameter</b>-টা বোঝায়। একে <b>shadowing</b> বলে। Field বোঝাতে হলে <code>this.name</code> লিখতে হবে।</p>
+<div class="grid2">
+<div class="codewrap"><pre class="java"><code>public class A {
+    public int y = 4, sum = 9;
+
+    public A(int y, int temp) {
+        y = temp - 1;     // parameter y বদলায়, field না!
+        sum = temp + 2;   // local sum নেই → field sum
+        this.y = 100;     // field y বদলায়
+    }
+}</code></pre></div>
+<table class="mini"><tr><th>লেখা</th><th>কোনটা বদলায়?</th></tr>
+<tr><td><code>y = ...</code> (local/param y আছে)</td><td>local/parameter</td></tr>
+<tr><td><code>y = ...</code> (local y নেই)</td><td>field (this.y)</td></tr>
+<tr><td><code>this.y = ...</code></td><td>সবসময় field</td></tr></table>
+</div>
+<p class="tip">🔎 Tracing tip: প্রতিটা method শুরুর আগে লিখে রাখো এই method-এ কোন কোন নাম <b>local</b> (parameter + ভেতরে declare করা)। বাকি সব নাম <b>field</b>।</p>
+</div>
+
+<div class="concept" id="b-moverload">
+<h3>5. Method Overloading</h3>
+<p>একই class-এ <b>একই নামের একাধিক method</b>, কিন্তু <b>parameter list আলাদা</b>। Parameter list আলাদা হতে পারে ৩ ভাবে:</p>
+<div class="grid3">
+<div class="pill-card"><b>① সংখ্যা</b><br><code>add(int a, int b)</code><br><code>add(int a, int b, int c)</code></div>
+<div class="pill-card"><b>② Type</b><br><code>setParameters(String, int, int)</code><br><code>setParameters(String, double, double)</code></div>
+<div class="pill-card"><b>③ Order</b><br><code>addItem(String, double)</code><br><code>addItem(double, String)</code></div>
+</div>
+<table class="mini wide"><tr><th>এগুলো overloading <u>না</u> (compile error)</th><th>কেন?</th></tr>
+<tr><td><code>int f(int a)</code> আর <code>void f(int a)</code></td><td>শুধু return type আলাদা হলে চলবে না</td></tr>
+<tr><td><code>f(int a)</code> আর <code>f(int b)</code></td><td>শুধু parameter-এর <b>নাম</b> আলাদা, type একই</td></tr></table>
+<p><b>Signature = method-এর নাম + parameter-এর type গুলোর list (order সহ)।</b> Return type signature-এর অংশ না।</p>
+</div>
+
+<div class="concept">
+<h3>6. Java কীভাবে ঠিক করে কোন version call হবে?</h3>
+<p>Compile time-এ Java call-এর <b>argument গুলোর type আর সংখ্যা</b> দেখে, তারপর যে method-এর parameter list মেলে সেটা বেছে নেয়।</p>
+<div class="codewrap"><pre class="java"><code>circle.setParameters("Circle", 5);            // (String, int)          → circle
+triangle.setParameters("Triangle", 4, 7);     // (String, int, int)     → triangle
+rectangle.setParameters("Rectangle", 2.4, 4.4); // (String, double, double) → rectangle
+
+a1.methodB(1, x);        // x হলো int[] → methodB(int, int[])
+this.methodB(x, m);      // দুইটাই int  → methodB(int, int)
+c1.giveDiscount(10);     // parameter double হলে int → double auto widening (10 → 10.0)</code></pre></div>
+</div>
+
+<div class="concept" id="b-tips">
+<h3>7. Tracing cheat-sheet: যে ফাঁদগুলোয় সবাই পড়ে</h3>
+<div class="tips">
+<div class="tipc"><h4>🔢 x++ vs ++x</h4><p><code>x++</code>: আগে পুরনো value <b>ব্যবহার</b>, পরে বাড়ে। <code>++x</code>: আগে বাড়ে, পরে ব্যবহার।<br><code>methodB(x++, …)</code> with x=2 → <b>2</b> pass হয়, পরে x = 3।</p></div>
+<div class="tipc"><h4>➡️ বাম থেকে ডানে evaluation</h4><p><code>y = y + m + call()</code>: call হওয়ার <b>আগেই</b> y-এর পুরনো value পড়া হয়ে যায়। call-এর ভেতরে y বদলালেও সেটা overwrite হয়ে যাবে।<br><code>arr[0] += call()</code>: arr[0]-এর পুরনো value আগে পড়া হয়।</p></div>
+<div class="tipc"><h4>🧵 String concatenation</h4><p>একবার String চলে আসলে পরের <code>+</code> সব <b>জোড়া লাগানো</b>:<br><code>11 + " " + 3 + 11</code> → <b>"11 311"</b><br>কিন্তু <code>x + " " + (m + this.x)</code> → bracket-এর ভেতরে আগে যোগ।</p></div>
+<div class="tipc"><h4>➗ Integer division ও precedence</h4><p><code>10 / 3 = 3</code>, <code>7 / 2 = 3</code> (int হলে দশমিক কেটে যায়)।<br><code>*, /, %</code> আগে, <code>+, -</code> পরে: <code>2 + 11 % 3 * 3.0</code> = 2 + 2*3.0 = <b>8.0</b></p></div>
+<div class="tipc"><h4>📦 Primitive vs Array argument</h4><p>int/double parameter হলো <b>copy</b>, method-এ বদলালে caller-এর variable বদলায় না।<br>Array/object পাঠালে <b>reference</b> যায়, <code>n[0] = …</code> করলে main-এর array-ও বদলায়!</p></div>
+<div class="tipc"><h4>🧱 প্রতি call-এ নতুন frame</h4><p>Method-এর local variable আর local array (<code>int arr[] = {3,4,5}</code>) প্রতিবার call-এ <b>নতুন করে</b> তৈরি হয়। আগের call-এর value থাকে না।</p></div>
+<div class="tipc"><h4>🗑 Return value ignore</h4><p><code>methodB(m);</code>: return করা value কোথাও রাখা না হলে সেটা হারিয়ে যায়, কিন্তু method-এর ভেতরের <b>print আর field change</b> ঠিকই হয়।</p></div>
+<div class="tipc"><h4>🏗 Constructor-ও print করে</h4><p><code>new Maze()</code> লিখলেই constructor চলে। ভেতরে method call/print থাকলে সেটা output-এ আসবে। <code>new Maze().methodB(7,15)</code> → আগে constructor, তারপর method।</p></div>
+</div>
+<p class="tip">📝 <b>Exam-এ trace করার নিয়ম:</b> (1) প্রতিটা object-এর জন্য একটা box বানাও, field গুলো লিখে রাখো। (2) প্রতিটা method call-এ আলাদা box (frame) বানাও, local গুলো সেখানে লেখো। (3) প্রতিটা line-এ কোন variable বদলালো কেটে নতুন value লেখো। (4) print হলে output table-এ এক row-তে লেখো।</p>
+</div>
+</section>
+<section id="classwork"><h2><span class="num">02</span> Classwork</h2>
+<article class="task" id="cw1">
+<h3>Task 1 — Shape (method overloading)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Driver code-এর output মিলিয়ে <b>Shape</b> class design করতে হবে। একই <code>setParameters()</code> method ৩ ভাবে call হচ্ছে: circle (radius), triangle (base, height), rectangle (length, width)।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">ShapeTester.java</div><pre class="java"><code>public class ShapeTester{
+  public static void main(String args []){
+    Shape circle = new Shape();
+    Shape triangle = new Shape();
+    Shape rectangle = new Shape();
+    circle.setParameters(&quot;Circle&quot;, 5);
+    triangle.setParameters(&quot;Triangle&quot;, 4, 7);
+    rectangle.setParameters(&quot;Rectangle&quot;, 2.4, 4.4);
+    System.out.println(circle.details());
+    System.out.println(&quot;1---------------&quot;);
+    System.out.println(triangle.details());
+    System.out.println(&quot;2---------------&quot;);
+    System.out.println(rectangle.details());
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li><b>setParameters</b> কে ৩ বার <b>overload</b> করেছি: <code>(String, int)</code>, <code>(String, int, int)</code>, <code>(String, double, double)</code>।</li>
+<li>Java argument-এর <b>সংখ্যা আর type</b> দেখে ঠিক করে কোনটা call হবে: <code>("Triangle", 4, 7)</code> → দুইটা int → triangle version; <code>("Rectangle", 2.4, 4.4)</code> → দুইটা double → rectangle version।</li>
+<li>Area: circle = πr², triangle = ½ × base × height, rectangle = length × width।</li>
+<li>Output-এ দুই decimal দরকার, তাই <code>String.format("%.2f", area)</code>। <code>details()</code> একটা String <b>return</b> করে, print করে না, কারণ driver নিজে <code>println</code> করছে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Shape.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Shape {
+    public String name;
+    public double area;
+
+    // Circle: name + radius
+    public void setParameters(String name, int radius) {
+        this.name = name;
+        this.area = Math.PI * radius * radius;
+    }
+
+    // Triangle: name + base + height (int, int)
+    public void setParameters(String name, int base, int height) {
+        this.name = name;
+        this.area = 0.5 * base * height;
+    }
+
+    // Rectangle: name + length + width (double, double)
+    public void setParameters(String name, double length, double width) {
+        this.name = name;
+        this.area = length * width;
+    }
+
+    public String details() {
+        return &quot;Shape Name: &quot; + name + &quot;\nArea: &quot; + String.format(&quot;%.2f&quot;, area);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Shape Name: Circle
+Area: 78.54
+1---------------
+Shape Name: Triangle
+Area: 14.00
+2---------------
+Shape Name: Rectangle
+Area: 10.56</pre></details></div>
+</article><article class="task" id="cw2">
+<h3>Task 2 — Shape2D (constructor overloading)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Shape2D</b> class এমনভাবে design করো যাতে ৪ রকম ভাবে object বানানো যায়: argument ছাড়া (square), ২টা int (rectangle), ২টা int + String (triangle with height/base), ৩টা int (triangle with 3 sides)।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">Shape2DTester.java</div><pre class="java"><code>public class Shape2DTester {
+  public static void main(String[] args) {
+    Shape2D sq = new Shape2D();
+    System.out.println(&quot;---------1----------&quot;);
+    sq.area();
+    System.out.println(&quot;---------2----------&quot;);
+    Shape2D rectangle = new Shape2D(5, 6);
+    System.out.println(&quot;---------3----------&quot;);
+    rectangle.area();
+    System.out.println(&quot;---------4----------&quot;);
+    Shape2D tri1 = new Shape2D(5, 6, &quot;Triangle&quot;);
+    System.out.println(&quot;---------5----------&quot;);
+    tri1.area();
+    System.out.println(&quot;---------6----------&quot;);
+    Shape2D tri2 = new Shape2D(5, 6, 7);
+    System.out.println(&quot;---------7----------&quot;);
+    tri2.area();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>এখানে <b>৪টা constructor</b>, প্রত্যেকটার parameter list আলাদা, এটাই <b>constructor overloading</b>।</li>
+<li><code>(int, int, String)</code> আর <code>(int, int, int)</code> দুইটাতেই ৩টা parameter, কিন্তু ৩য়টার <b>type</b> আলাদা, তাই valid overloading।</li>
+<li>প্রতিটা constructor একটা <code>type</code> field-এ মনে রাখে কোন shape বানানো হলো; পরে <code>area()</code> সেটা দেখে formula বেছে নেয়।</li>
+<li>৩ বাহু দিয়ে triangle-এর area-র জন্য <b>Heron's formula</b>: s = (a+b+c)/2, area = √(s(s−a)(s−b)(s−c)) → 5,6,7 এর জন্য 14.70।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Shape2D.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Shape2D {
+    public String type;
+    public int a, b, c;
+
+    // No argument -&gt; Square of length 5
+    public Shape2D() {
+        type = &quot;Square&quot;;
+        a = 5;
+        System.out.println(&quot;A Square has been created with length: &quot; + a);
+    }
+
+    // Two ints -&gt; Rectangle
+    public Shape2D(int length, int breadth) {
+        type = &quot;Rectangle&quot;;
+        a = length;
+        b = breadth;
+        System.out.println(&quot;A Rectangle has been created with length: &quot; + a + &quot; and breadth: &quot; + b);
+    }
+
+    // Two ints + String -&gt; Triangle with height &amp; base
+    public Shape2D(int height, int base, String name) {
+        type = name;   // &quot;Triangle&quot;
+        a = height;
+        b = base;
+        System.out.println(&quot;A Triangle has been created with height: &quot; + a + &quot; and base: &quot; + b);
+    }
+
+    // Three ints -&gt; Triangle with three sides
+    public Shape2D(int s1, int s2, int s3) {
+        type = &quot;TriangleSides&quot;;
+        a = s1;
+        b = s2;
+        c = s3;
+        System.out.println(&quot;A Triangle has been created with the following sides: &quot; + a + &quot;, &quot; + b + &quot;, &quot; + c);
+    }
+
+    public void area() {
+        double result;
+        String name;
+        if (type.equals(&quot;Square&quot;)) {
+            result = a * a;
+            name = &quot;Square&quot;;
+        } else if (type.equals(&quot;Rectangle&quot;)) {
+            result = a * b;
+            name = &quot;Rectangle&quot;;
+        } else if (type.equals(&quot;Triangle&quot;)) {
+            result = 0.5 * a * b;
+            name = &quot;Triangle&quot;;
+        } else {                       // Heron&#x27;s formula
+            double s = (a + b + c) / 2.0;
+            result = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+            name = &quot;Triangle&quot;;
+        }
+        System.out.println(&quot;The area of the &quot; + name + &quot; is: &quot; + String.format(&quot;%.2f&quot;, result));
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">A Square has been created with length: 5
+---------1----------
+The area of the Square is: 25.00
+---------2----------
+A Rectangle has been created with length: 5 and breadth: 6
+---------3----------
+The area of the Rectangle is: 30.00
+---------4----------
+A Triangle has been created with height: 5 and base: 6
+---------5----------
+The area of the Triangle is: 15.00
+---------6----------
+A Triangle has been created with the following sides: 5, 6, 7
+---------7----------
+The area of the Triangle is: 14.70</pre></details></div>
+</article><article class="task" id="cw3">
+<h3>Task 3 — Library</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Library</b> class বানাও: constructor-এ capacity দেওয়া হবে, <code>addBook()</code> দিয়ে বই যোগ হবে (capacity-র বেশি না), <code>printDetail()</code> সব info print করবে।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">Tester5.java</div><pre class="java"><code>public class Tester5{
+  public static void main(String[] args) {
+    Library a1 = new Library(3);
+    System.out.println(&quot;1-------------&quot;);
+    a1.addBook(&quot;Ice&quot;);
+    System.out.println(&quot;2-------------&quot;);
+    a1.printDetail();
+    System.out.println(&quot;3-------------&quot;);
+    a1.addBook(&quot;Emma&quot;);
+    a1.addBook(&quot;Wings&quot;);
+    a1.addBook(&quot;Next&quot;);
+    System.out.println(&quot;4-------------&quot;);
+    a1.printDetail();
+    System.out.println(&quot;5-------------&quot;);
+    Library a2 = new Library(4);
+    System.out.println(&quot;6-------------&quot;);
+    a2.addBook(&quot;Onnobhubon&quot;);
+    a2.addBook(&quot;Ami&quot;);
+    System.out.println(&quot;7-------------&quot;);
+    a2.printDetail();
+    System.out.println(&quot;8-------------&quot;);
+    a2.addBook(&quot;Deyal&quot;);
+    a2.addBook(&quot;Himu&quot;);
+    a2.addBook(&quot;Megher Upor Bari&quot;);
+    System.out.println(&quot;9-------------&quot;);
+    a2.printDetail();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>Constructor <code>Library(int capacity)</code> ঠিক ওই size-এর একটা <code>String[]</code> array বানায়।</li>
+<li><code>count</code> দিয়ে track করি কয়টা বই আছে। <code>count &lt; capacity</code> হলে add, না হলে "Exceeds maximum capacity..." message।</li>
+<li><code>printDetail()</code>-এ loop চলে <b>count পর্যন্ত</b>, capacity পর্যন্ত না, নাহলে খালি জায়গায় <code>null</code> print হবে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Library.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Library {
+    public int capacity;
+    public String[] books;
+    public int count = 0;
+
+    public Library(int capacity) {
+        this.capacity = capacity;
+        this.books = new String[capacity];
+        System.out.println(&quot;A library has been created with capacity &quot; + capacity);
+    }
+
+    public void addBook(String name) {
+        if (count &lt; capacity) {
+            books[count] = name;
+            count++;
+            System.out.println(&quot;Book &#x27;&quot; + name + &quot;&#x27; added to the library&quot;);
+        } else {
+            System.out.println(&quot;Exceeds maximum capacity. You can&#x27;t add more than &quot; + capacity + &quot; books&quot;);
+        }
+    }
+
+    public void printDetail() {
+        System.out.println(&quot;Maximum Capacity: &quot; + capacity);
+        System.out.println(&quot;Total Books: &quot; + count);
+        System.out.println(&quot;Book list:&quot;);
+        for (int i = 0; i &lt; count; i++) {
+            System.out.println(books[i]);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">A library has been created with capacity 3
+1-------------
+Book &#x27;Ice&#x27; added to the library
+2-------------
+Maximum Capacity: 3
+Total Books: 1
+Book list:
+Ice
+3-------------
+Book &#x27;Emma&#x27; added to the library
+Book &#x27;Wings&#x27; added to the library
+Exceeds maximum capacity. You can&#x27;t add more than 3 books
+4-------------
+Maximum Capacity: 3
+Total Books: 3
+Book list:
+Ice
+Emma
+Wings
+5-------------
+A library has been created with capacity 4
+6-------------
+Book &#x27;Onnobhubon&#x27; added to the library
+Book &#x27;Ami&#x27; added to the library
+7-------------
+Maximum Capacity: 4
+Total Books: 2
+Book list:
+Onnobhubon
+Ami
+8-------------
+Book &#x27;Deyal&#x27; added to the library
+Book &#x27;Himu&#x27; added to the library
+Exceeds maximum capacity. You can&#x27;t add more than 4 books
+9-------------
+Maximum Capacity: 4
+Total Books: 4
+Book list:
+Onnobhubon
+Ami
+Deyal
+Himu</pre></details></div>
+</article><article class="task" id="cw4">
+<h3>Task 4 — TaxiLagbe</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>TaxiLagbe</b> class: taxi number আর area দিয়ে (বা শুধু number দিয়ে) taxi বানানো যাবে। সর্বোচ্চ <b>৪ জন</b> passenger। একবারে ১ জন বা ২ জন passenger add করা যাবে।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">TaxiTester.java</div><pre class="java"><code>public class TaxiTester{
+  public static void main(String[] args) {
+    TaxiLagbe taxi1 = new TaxiLagbe(&quot;1010-01&quot;,&quot;Dhaka&quot;);
+    System.out.println(&quot;1-------------&quot;);
+    taxi1.printDetails();
+    System.out.println(&quot;2-------------&quot;);
+    taxi1.addPassenger(&quot;Wilson&quot;, 105);
+    System.out.println(&quot;3-------------&quot;);
+    taxi1.printDetails();
+    System.out.println(&quot;4-------------&quot;);
+    taxi1.addPassenger(&quot;Walker&quot;, 100, &quot;Wood&quot;, 200);
+    System.out.println(&quot;5-------------&quot;);
+    taxi1.printDetails();
+    System.out.println(&quot;6-------------&quot;);
+    taxi1.addPassenger(&quot;Karen&quot;, 200);
+    taxi1.addPassenger(&quot;Donald&quot;, 130);
+    System.out.println(&quot;7-------------&quot;);
+    taxi1.printDetails();
+    System.out.println(&quot;8-------------&quot;);
+    TaxiLagbe taxi2 = new TaxiLagbe(&quot;1010-02&quot;);
+    System.out.println(&quot;9-------------&quot;);
+    taxi2.addPassenger(&quot;Don&quot;, 115, &quot;Parker&quot;, 215);
+    System.out.println(&quot;10-------------&quot;);
+    taxi2.printDetails();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li><b>Constructor overloading:</b> <code>TaxiLagbe(String, String)</code> আর <code>TaxiLagbe(String)</code>। Output দেখে বোঝা যায় area না দিলে default <b>"Khulna"</b>।</li>
+<li>দ্বিতীয় constructor <code>this(number, "Khulna")</code> দিয়ে প্রথমটাকে call করে, এটাকে <b>constructor chaining</b> বলে। <code>this(...)</code> সবসময় constructor-এর <b>প্রথম line</b>-এ থাকতে হয়।</li>
+<li><b>Method overloading:</b> <code>addPassenger(name, fare)</code> আর <code>addPassenger(name1, fare1, name2, fare2)</code>। দ্বিতীয়টা প্রথমটাকে ২ বার call করে, তাই code repeat করতে হয় না।</li>
+<li>Passenger list এক line-এ space দিয়ে; ০ জন হলে ওই line print হয় না (output খেয়াল করো)।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">TaxiLagbe.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class TaxiLagbe {
+    public String number;
+    public String area;
+    public String[] passengers = new String[4];
+    public int count = 0;
+    public int totalFare = 0;
+
+    public TaxiLagbe(String number, String area) {
+        this.number = number;
+        this.area = area;
+        System.out.println(&quot;A new taxi has been created&quot;);
+    }
+
+    // area na dile default &quot;Khulna&quot;
+    public TaxiLagbe(String number) {
+        this(number, &quot;Khulna&quot;);
+    }
+
+    public void addPassenger(String name, int fare) {
+        if (count &lt; 4) {
+            passengers[count] = name;
+            count++;
+            totalFare += fare;
+            System.out.println(&quot;Dear &quot; + name + &quot;! Welcome to TaxiLagbe&quot;);
+        } else {
+            System.out.println(&quot;Taxi Full! No more passengers can be added&quot;);
+        }
+    }
+
+    public void addPassenger(String name1, int fare1, String name2, int fare2) {
+        addPassenger(name1, fare1);
+        addPassenger(name2, fare2);
+    }
+
+    public void printDetails() {
+        System.out.println(&quot;Taxi number: &quot; + number);
+        System.out.println(&quot;This taxi can cover &quot; + area + &quot; area&quot;);
+        System.out.println(&quot;Total Passenger: &quot; + count);
+        System.out.println(&quot;Passenger List:&quot;);
+        if (count &gt; 0) {
+            String list = passengers[0];
+            for (int i = 1; i &lt; count; i++) {
+                list = list + &quot; &quot; + passengers[i];
+            }
+            System.out.println(list);
+        }
+        System.out.println(&quot;Total collected fare: &quot; + totalFare + &quot; Taka&quot;);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">A new taxi has been created
+1-------------
+Taxi number: 1010-01
+This taxi can cover Dhaka area
+Total Passenger: 0
+Passenger List:
+Total collected fare: 0 Taka
+2-------------
+Dear Wilson! Welcome to TaxiLagbe
+3-------------
+Taxi number: 1010-01
+This taxi can cover Dhaka area
+Total Passenger: 1
+Passenger List:
+Wilson
+Total collected fare: 105 Taka
+4-------------
+Dear Walker! Welcome to TaxiLagbe
+Dear Wood! Welcome to TaxiLagbe
+5-------------
+Taxi number: 1010-01
+This taxi can cover Dhaka area
+Total Passenger: 3
+Passenger List:
+Wilson Walker Wood
+Total collected fare: 405 Taka
+6-------------
+Dear Karen! Welcome to TaxiLagbe
+Taxi Full! No more passengers can be added
+7-------------
+Taxi number: 1010-01
+This taxi can cover Dhaka area
+Total Passenger: 4
+Passenger List:
+Wilson Walker Wood Karen
+Total collected fare: 605 Taka
+8-------------
+A new taxi has been created
+9-------------
+Dear Don! Welcome to TaxiLagbe
+Dear Parker! Welcome to TaxiLagbe
+10-------------
+Taxi number: 1010-02
+This taxi can cover Khulna area
+Total Passenger: 2
+Passenger List:
+Don Parker
+Total collected fare: 330 Taka</pre></details></div>
+</article><article class="task" id="cw5">
+<h3>Task 5 — Tracing (class A)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class A আর driver Tester6 দেওয়া আছে। Output কী হবে trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li><b>Constructor overloading:</b> <code>new A()</code> → A(), <code>new A(-5,-7)</code> → A(int, int)।</li>
+<li><b>Method overloading:</b> <code>methodB(1, x)</code>-এ x একটা array → <code>methodB(int, int[])</code>; ভেতরে <code>methodB(x, m)</code> দুইটা int → <code>methodB(int, int)</code>।</li>
+<li><b>Shadowing:</b> constructor-এর local <code>sum</code>, parameter <code>y, temp</code> field-কে বদলায় না!</li>
+<li><b>Evaluation order:</b> <code>y = y + m + call()</code>: call-এর আগেই পুরনো y পড়া হয়ে যায়।</li>
+<li><b>Array reference:</b> <code>n[0]</code> বদলালে main-এর <code>x</code> array-ও বদলায়, আর a2-এর call-এ সেই বদলানো value যায়।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="cw5"></div></div>
+</article></section>
+<section id="homework"><h2><span class="num">03</span> Homework</h2>
+<p class="lead">Coding Task 1–4 Google Form-এ submit, Tracing Task 5–6 হাতে লিখে lab-এর শুরুতে জমা।</p>
+<article class="task" id="hw1">
+<h3>Task 1 — Toy</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Toy</b> class design করো: object বানানোর সময় message print হবে, price আর name update করা যাবে।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">ToyTester.java</div><pre class="java"><code>public class ToyTester{
+    public static void main(String[] args){
+        Toy t1 = new Toy(&quot;Car&quot;, 230);
+        System.out.println(&quot;1=================&quot;);
+        t1.updatePrice(250);
+        System.out.println(&quot;2=================&quot;);
+        System.out.println(t1.name);
+        t1.showPrice();
+        System.out.println(&quot;3=================&quot;);
+        Toy t2 = new Toy(&quot;Robot&quot;, 450);
+        System.out.println(&quot;4=================&quot;);
+        t2.updateName(&quot;Autobot&quot;);
+        System.out.println(&quot;5=================&quot;);
+        System.out.println(t2.name);
+        t2.showPrice();
+    }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>Constructor <code>Toy(String name, int price)</code> field set করে আর "A new toy has been made!" print করে।</li>
+<li><code>updatePrice()</code> কিছু print করে না (output-এ 1 আর 2-এর মাঝে কিছু নেই)।</li>
+<li><code>updateName()</code>-এ আগে <b>পুরনো</b> নাম print, তারপর update, তারপর নতুন নাম print। Order ঠিক রাখা জরুরি।</li>
+<li>Driver সরাসরি <code>t1.name</code> access করে, তাই field <code>public</code> রাখতে হবে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Toy.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Toy {
+    public String name;
+    public int price;
+
+    public Toy(String name, int price) {
+        this.name = name;
+        this.price = price;
+        System.out.println(&quot;A new toy has been made!&quot;);
+    }
+
+    public void updatePrice(int newPrice) {
+        price = newPrice;
+    }
+
+    public void showPrice() {
+        System.out.println(&quot;price: &quot; + price + &quot; Taka&quot;);
+    }
+
+    public void updateName(String newName) {
+        System.out.println(&quot;Changing old name: &quot; + name);
+        name = newName;
+        System.out.println(&quot;new name: &quot; + name);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">A new toy has been made!
+1=================
+2=================
+Car
+price: 250 Taka
+3=================
+A new toy has been made!
+4=================
+Changing old name: Robot
+new name: Autobot
+5=================
+Autobot
+price: 450 Taka</pre></details></div>
+</article><article class="task" id="hw2">
+<h3>Task 2 — Cart</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>নিচের rules মেনে <b>Cart</b> class complete করো:</p><ul>
+<li>Cart number <code>create_cart()</code> method-এ assign হবে।</li><li>প্রতিটা cart-এ সর্বোচ্চ <b>৩টা</b> item।</li>
+<li>Item আর price রাখার জন্য দুইটা আলাদা array।</li><li><code>addItem()</code> দিয়ে item যোগ হবে যদি ৩টার কম থাকে।</li>
+<li><code>giveDiscount()</code> discount save করে আর price সেই অনুযায়ী update হয়।</li></ul>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">CartTester.java</div><pre class="java"><code>public class CartTester{
+  public static void main(String [] args){
+    Cart c1 = new Cart ();
+    Cart c2 = new Cart ();
+    Cart c3 = new Cart ();
+    c1.create_cart(1);
+    c2.create_cart(2);
+    c3.create_cart(3);
+    System.out.println(&quot;====1====&quot;);
+    c1.addItem(&quot;Table&quot;, 3900.5);
+    c1.addItem(&quot;Chair&quot;, 1400.76);
+    c1.addItem(5400.87, &quot;Television&quot;);
+    c1.addItem(5000.0, &quot;Refrigerator&quot;);
+    System.out.println(&quot;====2====&quot;);
+    c2.addItem(&quot;Stove&quot;,439.90);
+    System.out.println(&quot;====3====&quot;);
+    c3.addItem(&quot;Chair&quot;,1400.5);
+    c3.addItem(3400.0, &quot;Chair&quot;);
+    System.out.println(&quot;====4====&quot;);
+    c1.cartDetails();
+    System.out.println(&quot;====5====&quot;);
+    c2.cartDetails();
+    System.out.println(&quot;====6====&quot;);
+    c3.cartDetails();
+    c1.giveDiscount(10);
+    System.out.println(&quot;====7====&quot;);
+    c1.cartDetails();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li><code>addItem(String, double)</code> আর <code>addItem(double, String)</code>: parameter একই type-এর, কিন্তু <b>order আলাদা</b>, তাই এটাও valid overloading। দ্বিতীয়টা শুধু প্রথমটাকে উল্টো করে call করে।</li>
+<li><code>giveDiscount(10)</code>-এ int পাঠানো হলেও parameter <code>double</code>, Java নিজে int→double <b>widening</b> করে। তাই output-এ "10.0%"।</li>
+<li>Total = সব price যোগ, তারপর <code>total - total * discount / 100</code>।</li>
+<li>⚠️ <code>10702.130000000001</code> double precision-এর স্বাভাবিক ফল। হুবহু মেলাতে price গুলো <b>array-র order-এ</b> যোগ করতে হবে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Cart.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Cart {
+    public int cartNumber;
+    public String[] items = new String[3];
+    public double[] prices = new double[3];
+    public int count = 0;
+    public double discount = 0.0;
+
+    public void create_cart(int number) {
+        cartNumber = number;
+    }
+
+    // (String, double)
+    public void addItem(String item, double price) {
+        if (count &lt; 3) {
+            items[count] = item;
+            prices[count] = price;
+            count++;
+            System.out.println(item + &quot; added to cart &quot; + cartNumber + &quot;.&quot;);
+            System.out.println(&quot;You have &quot; + count + &quot; item(s) in your cart now.&quot;);
+        } else {
+            System.out.println(&quot;You already have 3 items on your cart&quot;);
+        }
+    }
+
+    // (double, String) -&gt; parameter order alada, tai eta-o overloading
+    public void addItem(double price, String item) {
+        addItem(item, price);
+    }
+
+    public void giveDiscount(double percent) {
+        discount = percent;
+    }
+
+    public void cartDetails() {
+        System.out.println(&quot;Your cart(c&quot; + cartNumber + &quot;) :&quot;);
+        double total = 0;
+        for (int i = 0; i &lt; count; i++) {
+            System.out.println(items[i] + &quot; - &quot; + prices[i]);
+            total += prices[i];
+        }
+        total = total - total * discount / 100;
+        System.out.println(&quot;Discount Applied: &quot; + discount + &quot;%&quot;);
+        System.out.println(&quot;Total price: &quot; + total);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">====1====
+Table added to cart 1.
+You have 1 item(s) in your cart now.
+Chair added to cart 1.
+You have 2 item(s) in your cart now.
+Television added to cart 1.
+You have 3 item(s) in your cart now.
+You already have 3 items on your cart
+====2====
+Stove added to cart 2.
+You have 1 item(s) in your cart now.
+====3====
+Chair added to cart 3.
+You have 1 item(s) in your cart now.
+Chair added to cart 3.
+You have 2 item(s) in your cart now.
+====4====
+Your cart(c1) :
+Table - 3900.5
+Chair - 1400.76
+Television - 5400.87
+Discount Applied: 0.0%
+Total price: 10702.130000000001
+====5====
+Your cart(c2) :
+Stove - 439.9
+Discount Applied: 0.0%
+Total price: 439.9
+====6====
+Your cart(c3) :
+Chair - 1400.5
+Chair - 3400.0
+Discount Applied: 0.0%
+Total price: 4800.5
+====7====
+Your cart(c1) :
+Table - 3900.5
+Chair - 1400.76
+Television - 5400.87
+Discount Applied: 10.0%
+Total price: 9631.917000000001</pre></details></div>
+</article><article class="task" id="hw3">
+<h3>Task 3 — Reader</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Reader</b> class: name, পড়ার capacity, আর বইয়ের array থাকবে। Initial capacity <b>2</b>, initial name <b>"New user"</b>।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">Reader_tester.java</div><pre class="java"><code>public class Reader_tester {
+  public static void main(String[] args){
+        System.out.println(&quot;1 ==========&quot;);
+        Reader r1 = new Reader(&quot;Messi&quot;);
+        Reader r2 = new Reader(&quot;Yamal&quot;, 3);
+        System.out.println(&quot;2 ==========&quot;);
+        r1.readerInfo();
+        System.out.println(&quot;3 ==========&quot;);
+        r2.addBook(&quot;Java&quot;);
+        r2.addBook(&quot;Python&quot;);
+        r2.addBook(&quot;C++&quot;);
+        r2.readerInfo();
+        System.out.println(&quot;4 ==========&quot;);
+        r1.addBook(&quot;C#&quot;);
+        r1.addBook(&quot;Rust&quot;);
+        r1.addBook(&quot;GoLang&quot;);
+        System.out.println(&quot;5 ==========&quot;);
+        r2.addBook(&quot;Python&quot;);
+        System.out.println(&quot;6 ==========&quot;);
+        r1.readerInfo();
+        System.out.println(&quot;7 ==========&quot;);
+        r1.updateCapacity(3);
+        System.out.println(&quot;8 ==========&quot;);
+        r1.addBook(&quot;GoLang&quot;);
+        System.out.println(&quot;9 ==========&quot;);
+        r1.readerInfo();
+    }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>দুইটা constructor: <code>Reader(String name)</code> (capacity default 2) আর <code>Reader(String name, int capacity)</code>।</li>
+<li>Field declare করার সময়ই default দিয়ে রাখি: <code>name = "New user"</code>, <code>capacity = 2</code>। Constructor পরে চাইলে override করে।</li>
+<li><code>addBook()</code>: জায়গা না থাকলে "No more capacity"। r1 তিনটা বই add করতে চায়, শুধু ৩য়টায় message আসে।</li>
+<li><code>updateCapacity()</code>: Java array-এর size পরে বাড়ানো যায় না, তাই <b>নতুন বড় array</b> বানিয়ে পুরনো বই copy করি।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Reader.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Reader {
+    public String name = &quot;New user&quot;;
+    public int capacity = 2;
+    public String[] books;
+    public int count = 0;
+
+    public Reader(String name) {
+        this.name = name;
+        books = new String[capacity];
+        System.out.println(&quot;A new reader is created!&quot;);
+    }
+
+    public Reader(String name, int capacity) {
+        this.name = name;
+        this.capacity = capacity;
+        books = new String[capacity];
+        System.out.println(&quot;A new reader is created!&quot;);
+    }
+
+    public void addBook(String book) {
+        if (count &lt; capacity) {
+            books[count] = book;
+            count++;
+        } else {
+            System.out.println(&quot;No more capacity&quot;);
+        }
+    }
+
+    public void readerInfo() {
+        System.out.println(&quot;Name: &quot; + name);
+        System.out.println(&quot;Capacity: &quot; + capacity);
+        System.out.println(&quot;Books:&quot;);
+        if (count == 0) {
+            System.out.println(&quot;No books added yet&quot;);
+        } else {
+            for (int i = 0; i &lt; count; i++) {
+                System.out.println(&quot;Book &quot; + (i + 1) + &quot;: &quot; + books[i]);
+            }
+        }
+    }
+
+    public void updateCapacity(int newCapacity) {
+        String[] newBooks = new String[newCapacity];
+        for (int i = 0; i &lt; count; i++) {
+            newBooks[i] = books[i];       // purono book copy
+        }
+        books = newBooks;
+        capacity = newCapacity;
+        System.out.println(&quot;Capacity has changed to &quot; + capacity);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">1 ==========
+A new reader is created!
+A new reader is created!
+2 ==========
+Name: Messi
+Capacity: 2
+Books:
+No books added yet
+3 ==========
+Name: Yamal
+Capacity: 3
+Books:
+Book 1: Java
+Book 2: Python
+Book 3: C++
+4 ==========
+No more capacity
+5 ==========
+No more capacity
+6 ==========
+Name: Messi
+Capacity: 2
+Books:
+Book 1: C#
+Book 2: Rust
+7 ==========
+Capacity has changed to 3
+8 ==========
+9 ==========
+Name: Messi
+Capacity: 3
+Books:
+Book 1: C#
+Book 2: Rust
+Book 3: GoLang</pre></details></div>
+</article><article class="task" id="hw4">
+<h3>Task 4 — MoneyTracker</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Income আর expense track করার <b>MoneyTracker</b> বানাও:</p><ul>
+<li><code>createTracker()</code> balance 1.0 taka করে দেয়।</li><li><code>info()</code> tracker-এর info একটা String হিসেবে <b>return</b> করে।</li>
+<li><code>expense()</code>-এর পর balance 0 হলে "You're broke!", balance কম হলে "Not enough balance.", নাহলে update করে "Balance Updated."।</li>
+<li><code>showHistory()</code> শেষ income আর শেষ expense দেখায়।</li></ul>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">Tester4.java</div><pre class="java"><code>public class Tester4{
+ public static void main(String[] args) {
+    MoneyTracker tr1 = new MoneyTracker();
+    System.out.println(tr1.info());
+    tr1.createTracker(&quot;John&quot;);
+    System.out.println(&quot;1 ==========&quot;);
+    System.out.println(tr1.info());
+    System.out.println(&quot;2 ==========&quot;);
+    tr1.income(1000);
+    System.out.println(tr1.info());
+    System.out.println(&quot;3 ==========&quot;);
+    tr1.expense(800);
+    tr1.expense(100);
+    System.out.println(tr1.info());
+    System.out.println(&quot;4 ==========&quot;);
+    tr1.showHistory();
+    System.out.println(&quot;5 ==========&quot;);
+    tr1.expense(101);
+    System.out.println(&quot;6 ==========&quot;);
+    tr1.expense(200);
+    System.out.println(&quot;7 ==========&quot;);
+    tr1.income(200);
+    tr1.showHistory();
+ }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>No-arg constructor শুধু message print করে। তখন name = <code>null</code>, balance = <code>0.0</code> (default value), তাই প্রথম info()-তে "Name: null"।</li>
+<li><code>info()</code> print করে না, <code>"\n"</code> দিয়ে দুই line-এর String <b>return</b> করে।</li>
+<li><code>expense()</code> logic-এর order: আগে check <code>amount &gt; balance</code> → "Not enough balance."; নাহলে বিয়োগ করে last spent save; তারপর balance 0 হলে "You're broke!", নাহলে "Balance Updated."।</li>
+<li>খেয়াল করো: income-এ <b>"Balance Updated!"</b> (!) আর expense-এ <b>"Balance Updated."</b> (.)। Output হুবহু মেলাতে হবে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">MoneyTracker.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class MoneyTracker {
+    public String name;
+    public double balance;
+    public double lastAdded;
+    public double lastSpent;
+
+    public MoneyTracker() {
+        System.out.println(&quot;A new money tracker has been launched.&quot;);
+    }
+
+    public void createTracker(String name) {
+        this.name = name;
+        balance = 1.0;
+    }
+
+    public String info() {
+        return &quot;Name: &quot; + name + &quot;\nCurrent Balance: &quot; + balance;
+    }
+
+    public void income(double amount) {
+        balance += amount;
+        lastAdded = amount;
+        System.out.println(&quot;Balance Updated!&quot;);
+    }
+
+    public void expense(double amount) {
+        if (amount &gt; balance) {
+            System.out.println(&quot;Not enough balance.&quot;);
+        } else {
+            balance -= amount;
+            lastSpent = amount;
+            if (balance == 0) {
+                System.out.println(&quot;You&#x27;re broke!&quot;);
+            } else {
+                System.out.println(&quot;Balance Updated.&quot;);
+            }
+        }
+    }
+
+    public void showHistory() {
+        System.out.println(&quot;Last added: &quot; + lastAdded);
+        System.out.println(&quot;Last spent: &quot; + lastSpent);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">A new money tracker has been launched.
+Name: null
+Current Balance: 0.0
+1 ==========
+Name: John
+Current Balance: 1.0
+2 ==========
+Balance Updated!
+Name: John
+Current Balance: 1001.0
+3 ==========
+Balance Updated.
+Balance Updated.
+Name: John
+Current Balance: 101.0
+4 ==========
+Last added: 1000.0
+Last spent: 100.0
+5 ==========
+You&#x27;re broke!
+6 ==========
+Not enough balance.
+7 ==========
+Balance Updated!
+Last added: 200.0
+Last spent: 101.0</pre></details></div>
+</article><article class="task" id="hw5">
+<h3>Task 5 — Tracing (class A)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class A আর Tester11 দেওয়া আছে, output trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li>Constructor নেই → <b>default constructor</b>; x, y = 0।</li>
+<li><code>methodB(this.x)</code> → এক parameter version; ভেতরে <code>methodB(2, y)</code> → দুই parameter version।</li>
+<li><code>x++</code> → পুরনো value pass হয়, পরে বাড়ে।</li>
+<li><code>%</code>, <code>*</code> আগে, <code>+</code> পরে।</li>
+<li>⚠️ <code>this.x + " " + x + y</code> → String concat: "11 " + 3 + 11 = <b>"11 311"</b>।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="hw5"></div></div>
+</article><article class="task" id="hw6">
+<h3>Task 6 — Tracing (class Maze)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class Maze আর MazeTester দেওয়া আছে, output trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li><code>methodB(int)</code> returns int, <code>methodB(int, int)</code> void, argument সংখ্যা দেখে বেছে নাও।</li>
+<li>Constructor-এর ভেতর থেকেও method call হয়, তাই <code>new Maze()</code> নিজেই print করে!</li>
+<li><code>methodB(int y)</code>-এ local x নেই, তাই <code>x = y*y</code> <b>field</b> বদলায়। কিন্তু <code>methodB(int z, int x)</code>-এ x parameter, তাই <code>x = ...</code> field বদলায় না।</li>
+<li><code>new Maze().methodB(7,15)</code> → নতুন object, আবার constructor চলে ("15 0"), তারপর methodB।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="hw6"></div></div>
+</article></section>
+<section id="ungraded"><h2><span class="num">04</span> Ungraded Tasks (Optional)</h2>
+<p class="lead">জমা দিতে হবে না, তবে practice-এর জন্য খুব ভালো।</p>
+<article class="task" id="ug1">
+<h3>Task 1 — Customer</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Customer-এর cart: item একা (price ছাড়া), item + price, অথবা একসাথে দুইটা item add করা যায়। সর্বোচ্চ ৪টা item।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">CustomerTester.java</div><pre class="java"><code>public class CustomerTester {
+  public static void main(String[] args) {
+    Customer c1 = new Customer();
+    c1.createCustomer(&quot;John&quot;);
+    System.out.println(&quot;1=====================&quot;);
+    c1.showCart();
+    System.out.println(&quot;2=====================&quot;);
+    c1.addItem(&quot;Apple&quot;, 2);
+    c1.addItem(&quot;Bread&quot;, 5);
+    c1.addItem(&quot;Milk&quot;);
+    c1.addItem(&quot;Eggs&quot;, 2);
+    System.out.println(&quot;3=====================&quot;);
+    c1.showCart();
+    System.out.println(&quot;4=====================&quot;);
+    c1.calculatePrice();
+    System.out.println(&quot;5=====================&quot;);
+    Customer c2 = new Customer();
+    c2.createCustomer(&quot;Jane&quot;);
+    c2.addItem(&quot;Apple&quot;, 2, &quot;Orange&quot;, 5);
+    c2.addItem(&quot;Chocolates&quot;, 15, &quot;Bread&quot;, 5);
+    c2.addItem(&quot;Milk&quot;, 3);
+    System.out.println(&quot;6=====================&quot;);
+    c2.showCart();
+    System.out.println(&quot;7=====================&quot;);
+    c2.calculatePrice();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li><code>addItem</code> ৩ ভাবে overload: <code>(String)</code> → default price 3 (Milk = 3), <code>(String, int)</code>, <code>(String, int, String, int)</code>।</li>
+<li>Capacity 4, ভরে গেলে "Cart is full"।</li>
+<li>⚠️ <b>PDF-এর driver-এ typo আছে:</b> output-এ "Orange added to cart" আছে, কিন্তু driver-এ সেই line নেই। সম্ভবত <code>c1.addItem("Orange", 5);</code> বাদ পড়েছে। আমি সেটা যোগ করে test করেছি, তাহলে output হুবহু মেলে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Customer.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Customer {
+    public String name;
+    public String[] items = new String[4];
+    public int[] prices = new int[4];
+    public int count = 0;
+
+    public void createCustomer(String name) {
+        this.name = name;
+    }
+
+    // price na dile default 3
+    public void addItem(String item) {
+        addItem(item, 3);
+    }
+
+    public void addItem(String item, int price) {
+        if (count &lt; 4) {
+            items[count] = item;
+            prices[count] = price;
+            count++;
+            System.out.println(item + &quot; added to cart&quot;);
+        } else {
+            System.out.println(&quot;Cart is full&quot;);
+        }
+    }
+
+    public void addItem(String item1, int price1, String item2, int price2) {
+        if (count + 2 &lt;= 4) {
+            items[count] = item1;  prices[count] = price1;  count++;
+            items[count] = item2;  prices[count] = price2;  count++;
+            System.out.println(item1 + &quot; and &quot; + item2 + &quot; added to cart&quot;);
+        } else {
+            System.out.println(&quot;Cart is full&quot;);
+        }
+    }
+
+    public void showCart() {
+        System.out.println(&quot;Customer: &quot; + name);
+        for (int i = 0; i &lt; count; i++) {
+            System.out.println(&quot;Item: &quot; + items[i] + &quot; Price: &quot; + prices[i]);
+        }
+    }
+
+    public void calculatePrice() {
+        int total = 0;
+        for (int i = 0; i &lt; count; i++) total += prices[i];
+        System.out.println(&quot;Total: &quot; + total);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">1=====================
+Customer: John
+2=====================
+Apple added to cart
+Orange added to cart
+Bread added to cart
+Milk added to cart
+Cart is full
+3=====================
+Customer: John
+Item: Apple Price: 2
+Item: Orange Price: 5
+Item: Bread Price: 5
+Item: Milk Price: 3
+4=====================
+Total: 15
+5=====================
+Apple and Orange added to cart
+Chocolates and Bread added to cart
+Cart is full
+6=====================
+Customer: Jane
+Item: Apple Price: 2
+Item: Orange Price: 5
+Item: Chocolates Price: 15
+Item: Bread Price: 5
+7=====================
+Total: 27</pre></details></div>
+</article><article class="task" id="ug2">
+<h3>Task 2 — Student</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Student class: name আর program দিয়ে বানানো যাবে, update করা যাবে, program return করা যাবে।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">StudentTester.java</div><pre class="java"><code>public class StudentTester{
+   public static void main(String[] args){
+       Student s1 = new Student(&quot;Harry&quot;, &quot;CSE&quot;);
+       System.out.println(s1.name);
+       s1.updateName(&quot;Harry Potter&quot;);
+       System.out.println(s1.name);
+       System.out.println(s1.prog);
+       s1.updateProgram(&quot;CS&quot;);
+       String var = s1.accessProgram();
+       System.out.println(var);
+   }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li>Constructor-এ <code>this.name = name</code>: parameter আর field-এর নাম এক, তাই field বোঝাতে <code>this</code> লাগবে।</li><li><code>accessProgram()</code> value <b>return</b> করে, driver সেটা variable-এ রেখে print করে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Student.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Student {
+    public String name;
+    public String prog;
+
+    public Student(String name, String prog) {
+        this.name = name;
+        this.prog = prog;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateProgram(String prog) {
+        this.prog = prog;
+    }
+
+    public String accessProgram() {
+        return prog;
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Harry
+Harry Potter
+CSE
+CS</pre></details></div>
+</article><article class="task" id="ug3">
+<h3>Task 3 — Calculator</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Calculator: add (২ বা ৩টা সংখ্যা), multiply (২ বা ৩টা সংখ্যা), আর String × int (String repeat)।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">CalculatorTester.java</div><pre class="java"><code>public class CalculatorTester {
+  public static void main(String[] args) {
+    Calculator calc = new Calculator();
+    System.out.println(&quot;1=============&quot;);
+    calc.add(10, 20);
+    System.out.println(&quot;2=============&quot;);
+    calc.add(5, 15, 25);
+    System.out.println(&quot;3=============&quot;);
+    calc.multiply(6, 7);
+    System.out.println(&quot;4=============&quot;);
+    calc.multiply(2, 3, 4);
+    System.out.println(&quot;5=============&quot;);
+    calc.multiply(&quot;Hello&quot;, 3);
+    System.out.println(&quot;6=============&quot;);
+    calc.multiply(&quot;Java&quot;, 5);
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li><code>add</code> ২ বার, <code>multiply</code> ৩ বার overload। <code>multiply(String, int)</code> type দেখে আলাদা হয়ে যায়।</li><li>String repeat: প্রথমে s, তারপর (times−1) বার <code>"-" + s</code> জোড়া।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Calculator.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Calculator {
+    public void add(int a, int b) {
+        System.out.println(a + b);
+    }
+    public void add(int a, int b, int c) {
+        System.out.println(a + b + c);
+    }
+    public void multiply(int a, int b) {
+        System.out.println(a * b);
+    }
+    public void multiply(int a, int b, int c) {
+        System.out.println(a * b * c);
+    }
+    public void multiply(String s, int times) {
+        String result = s;
+        for (int i = 1; i &lt; times; i++) {
+            result = result + &quot;-&quot; + s;
+        }
+        System.out.println(result);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">1=============
+30
+2=============
+45
+3=============
+42
+4=============
+24
+5=============
+Hello-Hello-Hello
+6=============
+Java-Java-Java-Java-Java</pre></details></div>
+</article><article class="task" id="ug4">
+<h3>Task 4 — Book</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><code>createBook()</code> শুধু title, title + author, বা title + author + genre দিয়ে call করা যায়। Author না দিলে "Unknown"।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">LibraryTest.java</div><pre class="java"><code>public class LibraryTest {
+  public static void main(String[] args) {
+    Book book1 = new Book();
+    book1.createBook(&quot;The Great Gatsby&quot;);
+    Book book2 = new Book();
+    book2.createBook(&quot;1984&quot;, &quot;George Orwell&quot;);
+    Book book3 = new Book();
+    book3.createBook(&quot;To Kill a Mockingbird&quot;, &quot;Harper Lee&quot;, &quot;Fiction&quot;);
+    System.out.println(&quot;|---Book Customization---|&quot;);
+    book1.customizeGenre(&quot;Classic&quot;);
+    book1.customizePages(180);
+    book2.customizeGenre(&quot;Dystopian&quot;);
+    book2.customizePages(328);
+    book3.customizePages(281);
+    System.out.println();
+    System.out.println(&quot;|---Library Inventory---|&quot;);
+    book1.displayDetails();
+    book2.displayDetails();
+    book3.displayDetails();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li><code>createBook</code> ১/২/৩ parameter-এ overload।</li><li>Field <code>author = "Unknown"</code> default রেখেছি, যাতে না দিলে সেটাই থাকে।</li><li>Message-এর ভেতরে double quote লাগলে <code>\"</code> escape লাগবে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Book.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Book {
+    public String title;
+    public String author = &quot;Unknown&quot;;
+    public String genre;
+    public int pages;
+
+    public void createBook(String title) {
+        this.title = title;
+    }
+    public void createBook(String title, String author) {
+        this.title = title;
+        this.author = author;
+    }
+    public void createBook(String title, String author, String genre) {
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+    }
+
+    public void customizeGenre(String genre) {
+        this.genre = genre;
+        System.out.println(&quot;Updated genre of \&quot;&quot; + title + &quot;\&quot; to &quot; + genre + &quot;.&quot;);
+    }
+    public void customizePages(int pages) {
+        this.pages = pages;
+        System.out.println(&quot;Updated pages of \&quot;&quot; + title + &quot;\&quot; to &quot; + pages + &quot; pages.&quot;);
+    }
+
+    public void displayDetails() {
+        System.out.println(&quot;Title: &quot; + title + &quot;, Author: &quot; + author + &quot;, Genre: &quot; + genre + &quot;, Pages: &quot; + pages);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">|---Book Customization---|
+Updated genre of &quot;The Great Gatsby&quot; to Classic.
+Updated pages of &quot;The Great Gatsby&quot; to 180 pages.
+Updated genre of &quot;1984&quot; to Dystopian.
+Updated pages of &quot;1984&quot; to 328 pages.
+Updated pages of &quot;To Kill a Mockingbird&quot; to 281 pages.
+
+|---Library Inventory---|
+Title: The Great Gatsby, Author: Unknown, Genre: Classic, Pages: 180
+Title: 1984, Author: George Orwell, Genre: Dystopian, Pages: 328
+Title: To Kill a Mockingbird, Author: Harper Lee, Genre: Fiction, Pages: 281</pre></details></div>
+</article><article class="task" id="ug5">
+<h3>Task 5 — Movie</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Movie details (rating সহ বা ছাড়া), ১/২/৩ জন actor add, rating update, info দেখানো।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">MovieManagerTest.java</div><pre class="java"><code>public class MovieManagerTest {
+  public static void main(String[] args) {
+    Movie inception = new Movie();
+    inception.setMovieDetails(&quot;Inception&quot;, &quot;Christopher Nolan&quot;, 8.8);
+    System.out.println(&quot;1====================&quot;);
+    inception.addActors(&quot;Leonardo DiCaprio&quot;, &quot;Joseph Gordon-Levitt&quot;);
+    inception.addActors(&quot;Ellen Page&quot;);
+    inception.showInfo();
+    System.out.println(&quot;2====================&quot;);
+    Movie avengers = new Movie();
+    avengers.setMovieDetails(&quot;Avengers: Endgame&quot;, &quot;Anthony Russo&quot;, 8.4);
+    avengers.addActors(&quot;Robert Downey Jr.&quot;, &quot;Chris Evans&quot;, &quot;Scarlett Johansson&quot;);
+    avengers.showInfo();
+    System.out.println(&quot;3====================&quot;);
+    Movie parasite = new Movie();
+    parasite.setMovieDetails(&quot;Parasite&quot;, &quot;Bong Joon-ho&quot;);
+    parasite.addActors(&quot;Song Kang-ho&quot;, &quot;Choi Woo-shik&quot;);
+    parasite.updateRating(8.6);
+    parasite.showInfo();
+    System.out.println(&quot;4====================&quot;);
+    parasite.updateRating(8.9);
+    parasite.showInfo();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li><code>setMovieDetails</code>: ৩ আর ২ parameter version। <code>addActors</code>: ১, ২, ৩ parameter version, বড়গুলো ছোটটাকে বারবার call করে।</li><li>Actors comma দিয়ে join: প্রথমটার আগে comma বসে না।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Movie.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Movie {
+    public String title;
+    public String director;
+    public double rating;
+    public String[] actors = new String[10];
+    public int count = 0;
+
+    public void setMovieDetails(String title, String director, double rating) {
+        this.title = title;
+        this.director = director;
+        this.rating = rating;
+    }
+    public void setMovieDetails(String title, String director) {
+        this.title = title;
+        this.director = director;
+    }
+
+    public void addActors(String a1) {
+        actors[count] = a1;
+        count++;
+        System.out.println(&quot;Added actor \&quot;&quot; + a1 + &quot;\&quot; to \&quot;&quot; + title + &quot;\&quot;.&quot;);
+    }
+    public void addActors(String a1, String a2) {
+        addActors(a1);
+        addActors(a2);
+    }
+    public void addActors(String a1, String a2, String a3) {
+        addActors(a1);
+        addActors(a2);
+        addActors(a3);
+    }
+
+    public void updateRating(double rating) {
+        this.rating = rating;
+        System.out.println(&quot;Updated rating of \&quot;&quot; + title + &quot;\&quot; to &quot; + rating);
+    }
+
+    public void showInfo() {
+        System.out.println(&quot;Title: &quot; + title);
+        System.out.println(&quot;Director: &quot; + director);
+        System.out.println(&quot;Rating: &quot; + rating);
+        String list = &quot;&quot;;
+        for (int i = 0; i &lt; count; i++) {
+            if (i &gt; 0) list += &quot;, &quot;;
+            list += actors[i];
+        }
+        System.out.println(&quot;Actors: &quot; + list);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">1====================
+Added actor &quot;Leonardo DiCaprio&quot; to &quot;Inception&quot;.
+Added actor &quot;Joseph Gordon-Levitt&quot; to &quot;Inception&quot;.
+Added actor &quot;Ellen Page&quot; to &quot;Inception&quot;.
+Title: Inception
+Director: Christopher Nolan
+Rating: 8.8
+Actors: Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page
+2====================
+Added actor &quot;Robert Downey Jr.&quot; to &quot;Avengers: Endgame&quot;.
+Added actor &quot;Chris Evans&quot; to &quot;Avengers: Endgame&quot;.
+Added actor &quot;Scarlett Johansson&quot; to &quot;Avengers: Endgame&quot;.
+Title: Avengers: Endgame
+Director: Anthony Russo
+Rating: 8.4
+Actors: Robert Downey Jr., Chris Evans, Scarlett Johansson
+3====================
+Added actor &quot;Song Kang-ho&quot; to &quot;Parasite&quot;.
+Added actor &quot;Choi Woo-shik&quot; to &quot;Parasite&quot;.
+Updated rating of &quot;Parasite&quot; to 8.6
+Title: Parasite
+Director: Bong Joon-ho
+Rating: 8.6
+Actors: Song Kang-ho, Choi Woo-shik
+4====================
+Updated rating of &quot;Parasite&quot; to 8.9
+Title: Parasite
+Director: Bong Joon-ho
+Rating: 8.9
+Actors: Song Kang-ho, Choi Woo-shik</pre></details></div>
+</article><article class="task" id="ug6">
+<h3>Task 6 — Tracing (class Test3)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class Test3 আর Tester3 দেওয়া আছে, output trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li>Field গুলো উপর থেকে নিচে initialize: <code>arr = {x, y, sum}</code> = {2, 4, 3}।</li>
+<li><code>arr[0] += ...</code> → পুরনো arr[0] আগে পড়া হয়।</li>
+<li><code>arr2[0]++</code> (post) vs <code>++arr2[1]</code> (pre)।</li>
+<li>Integer division: 10/3 = 3, 7/2 = 3।</li><li>প্রতি call-এ <code>arr2</code> নতুন করে {7, 8}।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="ug6"></div></div>
+</article></section>
+
+
+<section id="lab">
+  <h2><span class="num">05</span> Tracing Lab: Lab 3</h2>
+  <p class="lead">Lab 3-এর ৪টা tracing problem এখানে <b>line by line</b> চালিয়ে দেখো। প্রতিটা step-এ: কোন line চলছে (হলুদ), call stack-এ কোন method-এর কোন local variable, heap-এ object/array-র field, আর console-এ কী print হলো। <span class="kbd">←</span> <span class="kbd">→</span> arrow key দিয়েও চালানো যায়।</p>
+  <div class="lab-bar">
+    <select id="labSel" aria-label="Problem"></select>
+    <button class="btn" id="labFirst" title="শুরু">⏮</button>
+    <button class="btn" id="labPrev">◀ Prev</button>
+    <button class="btn primary" id="labNext">Next ▶</button>
+    <button class="btn" id="labLast" title="শেষ">⏭</button>
+    <button class="btn" id="labNextOut" title="পরের print পর্যন্ত যাও">⏩ Next print</button>
+    <button class="btn" id="labPlay">⏵ Auto play</button>
+    <select id="labSpeed" aria-label="Speed"><option value="1800">Slow</option><option value="1100" selected>Normal</option><option value="500">Fast</option></select>
+    <span id="labCount"></span>
+    <input type="range" id="labRange" min="0" value="0">
+  </div>
+  <div id="labNote"></div>
+  <div class="lab-grid">
+    <div>
+      <div class="panel"><div class="panel-h">Class code</div><div class="numcode" id="labCls"></div></div>
+      <div class="panel" style="margin-top:14px"><div class="panel-h">Driver code (main)</div><div class="numcode" id="labDrv" style="max-height:200px"></div></div>
+    </div>
+    <div>
+      <div class="side-stack">
+        <div class="panel"><div class="panel-h">Call stack (frames)</div><div id="labStack"></div></div>
+        <div class="panel"><div class="panel-h">Heap (objects &amp; arrays)</div><div id="labHeap"></div></div>
+      </div>
+      <div class="panel" id="labOutWrap" style="margin-top:14px"><div class="panel-h">Console output <button class="btn" id="practiceHide" style="font-size:12px;padding:3px 10px;background:#26304a;color:#e8ecf3;border-color:#344058">🙈 Output লুকাও (practice)</button></div><div id="labOut"></div></div>
+      <div class="panel practice"><div class="panel-h">✍️ Practice: নিজের answer check করো</div>
+        <p class="tiny" style="margin:0 0 8px">আগে খাতায় trace করো, তারপর পুরো output এখানে লেখো (প্রতি line-এ একটা print)।</p>
+        <textarea id="practiceIn" placeholder="যেমন:&#10;10 1 29&#10;88 9 86&#10;..."></textarea>
+        <div style="margin-top:8px"><button class="btn primary" id="practiceBtn">Check answer</button></div>
+        <div id="practiceRes"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+<footer>CSE111 Lab Assignment 03 (Fall 26) · Study guide · সব code Java দিয়ে compile ও run করে verify করা</footer>
+<script>
+// ===== Tracing data: every step = one line executed =====
+// l = class line, d = driver line, set = changes, push/pop = method call frames, out = printed line
+const PROBS = {
+cw5: {
+  title: "Classwork Task 5 (class A + Tester6)",
+  alias: {"A#1":"a1","A#2":"a2","int[]#1":"x[] (main)"},
+  cls: `public class A{
+  public int temp = 3, sum = 9, y = 4, x = 0;
+  public A(){
+    int sum = 7;
+    y = temp - 5;
+    sum = temp + 2;
+    temp -= 2;
+    this.x = sum + temp + y;
+  }
+  public A(int y, int temp){
+    y = temp - 1 + x;
+    sum = temp + 2 -x;
+    temp-=2;
+  }
+  public void methodB(int m, int [] n){
+    int x = 0;
+    y = y + m + this.methodB(x,m);
+    x = this.x + 2 + (++n[0]);
+    sum = sum + x + y;
+    n[0] = sum + 2;
+    System.out.println(n[0] + " " + y+ " " + sum);
+  }
+  public int methodB(int m, int n){
+    int [] y = {10};
+    this.y = y[0] + this.y + m;
+    x = this.y + 2 + temp - n;
+    sum = x + y[0] + this.sum;
+    System.out.println(y[0]+ " "+ temp + " " + sum);
+    return y[0];
+  }
+}`,
+  drv: `public class Tester6 {
+  public static void main(String args[]){
+    int[] x = {35};
+    A a1;
+    a1 = new A();
+    A a2 = new A(-5,-7);
+    a1.methodB(1, x);
+    a2.methodB(1, x);
+  }
+}`,
+  steps: [
+  {d:3, heap:{"int[]#1":{arr:[35]}}, set:{"$.x":"→int[]#1"}, n:"main-এ <b>x</b> নামে একটা int array তৈরি হলো {35}। Array থাকে heap-এ, x শুধু তার <b>reference</b> রাখে।"},
+  {d:4, set:{"$.a1":"null"}, n:"a1 declare হলো, কিন্তু এখনো কোনো object নেই (null)।"},
+  {d:5, heap:{"A#1":{obj:{temp:3,sum:9,y:4,x:0}}}, push:{name:"A()  [a1]",vars:{this:"→A#1"}}, n:"<code>new A()</code> — কোনো argument নেই, তাই <b>no-arg constructor A()</b> call হলো। Constructor body চলার আগেই line 2-এর field initialization হয়ে যায়: temp=3, sum=9, y=4, x=0।"},
+  {l:4, set:{"$.sum":7}, n:"<code>int sum = 7;</code> — এটা একটা <b>local</b> variable sum, field sum (9) না! Local আর field-এর নাম এক হলে method-এর ভেতরে local-টাই field-কে <b>shadow</b> করে।"},
+  {l:5, set:{"A#1.y":-2}, n:"y = temp - 5 = 3 - 5 = <b>-2</b>। এখানে local y নেই, তাই এটা field this.y।"},
+  {l:6, set:{"$.sum":5}, n:"sum = temp + 2 = 5 — কিন্তু এটা <b>local sum</b>-এ যায়। Field sum এখনো 9।"},
+  {l:7, set:{"A#1.temp":1}, n:"temp -= 2 → 3 - 2 = <b>1</b> (field)।"},
+  {l:8, set:{"A#1.x":4}, n:"this.x = sum + temp + y = 5 (local) + 1 + (-2) = <b>4</b>।"},
+  {d:5, pop:1, set:{"$.a1":"→A#1"}, n:"Constructor শেষ, তার frame মুছে গেল। a1 এখন object-টাকে refer করে → a1 = {temp:1, sum:9, y:-2, x:4}"},
+  {d:6, heap:{"A#2":{obj:{temp:3,sum:9,y:4,x:0}}}, push:{name:"A(int y, int temp)  [a2]",vars:{this:"→A#2",y:-5,temp:-7}}, n:"<code>new A(-5,-7)</code> — দুইটা int argument, তাই overloaded constructor <b>A(int y, int temp)</b> call হলো। খেয়াল করো: parameter-এর নামও y আর temp — এরা field-কে shadow করবে!"},
+  {l:11, set:{"$.y":-8}, n:"y = temp - 1 + x → temp = parameter (-7), x = field (0): -7 - 1 + 0 = -8। এটা <b>parameter y</b>-তে যায়, field y (4) একদম বদলায় না!"},
+  {l:12, set:{"A#2.sum":-5}, n:"sum = temp + 2 - x = -7 + 2 - 0 = <b>-5</b>। sum নামে কোনো local/parameter নেই, তাই <b>field sum</b> বদলালো।"},
+  {l:13, set:{"$.temp":-9}, n:"temp -= 2 → parameter temp = -9। Field temp এখনো 3।"},
+  {d:6, pop:1, set:{"$.a2":"→A#2"}, n:"Constructor শেষ। a2 = {temp:3, sum:-5, y:4, x:0}"},
+  {d:7, push:{name:"methodB(int m, int[] n)  [a1]",vars:{this:"→A#1",m:1,n:"→int[]#1"}}, n:"<code>a1.methodB(1, x)</code> — দ্বিতীয় argument একটা <b>int[]</b>, তাই <b>methodB(int, int[])</b> version select হলো (method overloading)। n আর main-এর x <b>একই array</b> কে point করে।"},
+  {l:16, set:{"$.x":0}, n:"Local x = 0 (field x = 4 আলাদা জিনিস)।"},
+  {l:17, push:{name:"methodB(int m, int n)  [a1]",vars:{this:"→A#1",m:0,n:1}}, n:"<code>y = y + m + this.methodB(x,m)</code> — Java <b>বাম থেকে ডানে</b> evaluate করে: আগে y + m = -2 + 1 = <b>-1</b> হিসাব করে রাখে, তারপর this.methodB(0, 1) call। দুইটাই int, তাই <b>methodB(int, int)</b> version।"},
+  {l:24, heap:{"int[]#2":{arr:[10]}}, set:{"$.y":"→int[]#2"}, n:"Local array y = {10}। এটা field y না — field-এর জন্য লিখতে হবে this.y।"},
+  {l:25, set:{"A#1.y":8}, n:"this.y = y[0] + this.y + m = 10 + (-2) + 0 = <b>8</b>।"},
+  {l:26, set:{"A#1.x":10}, n:"x = this.y + 2 + temp - n = 8 + 2 + 1 - 1 = <b>10</b> (field x)।"},
+  {l:27, set:{"A#1.sum":29}, n:"sum = x + y[0] + this.sum = 10 + 10 + 9 = <b>29</b>।"},
+  {l:28, out:"10 1 29", n:"Print: y[0], temp, sum → <b>10 1 29</b>"},
+  {l:29, pop:1, del:["int[]#2"], n:"return y[0] = 10। Frame শেষ, local array আর কেউ use করে না (garbage)।"},
+  {l:17, set:{"A#1.y":9}, n:"আগে হিসাব করা -1 এর সাথে return value 10: y = -1 + 10 = <b>9</b>। ⚠️ methodB ভেতরে this.y = 8 করেছিল, কিন্তু সেটা overwrite হয়ে গেল কারণ পুরনো y (-2) আগেই পড়া হয়েছিল।"},
+  {l:18, set:{"int[]#1[0]":36,"$.x":48}, n:"<code>++n[0]</code> → pre-increment: 35 থেকে <b>36</b> (main-এর x array-ও বদলে গেল!)। local x = this.x + 2 + 36 = 10 + 2 + 36 = <b>48</b>।"},
+  {l:19, set:{"A#1.sum":86}, n:"sum = 29 + 48 + 9 = <b>86</b>"},
+  {l:20, set:{"int[]#1[0]":88}, n:"n[0] = 86 + 2 = <b>88</b>"},
+  {l:21, out:"88 9 86", pop:1, n:"Print n[0], y, sum → <b>88 9 86</b>"},
+  {d:8, push:{name:"methodB(int m, int[] n)  [a2]",vars:{this:"→A#2",m:1,n:"→int[]#1"}}, n:"<code>a2.methodB(1, x)</code> — এবার a2 object-এর উপর। a2 = {temp:3, sum:-5, y:4, x:0}। x array এখন {88}।"},
+  {l:16, set:{"$.x":0}, n:"local x = 0"},
+  {l:17, push:{name:"methodB(int m, int n)  [a2]",vars:{this:"→A#2",m:0,n:1}}, n:"y + m = 4 + 1 = <b>5</b> আগে হিসাব হয়ে রইল। তারপর methodB(0, 1) call।"},
+  {l:24, heap:{"int[]#3":{arr:[10]}}, set:{"$.y":"→int[]#3"}, n:"নতুন local array y = {10}"},
+  {l:25, set:{"A#2.y":14}, n:"this.y = 10 + 4 + 0 = <b>14</b>"},
+  {l:26, set:{"A#2.x":18}, n:"x = 14 + 2 + 3 - 1 = <b>18</b>"},
+  {l:27, set:{"A#2.sum":23}, n:"sum = 18 + 10 + (-5) = <b>23</b>"},
+  {l:28, out:"10 3 23", n:"Print → <b>10 3 23</b>"},
+  {l:29, pop:1, del:["int[]#3"], n:"return 10"},
+  {l:17, set:{"A#2.y":15}, n:"y = 5 + 10 = <b>15</b>"},
+  {l:18, set:{"int[]#1[0]":89,"$.x":109}, n:"++n[0] → 88 থেকে <b>89</b>। x = 18 + 2 + 89 = <b>109</b>"},
+  {l:19, set:{"A#2.sum":147}, n:"sum = 23 + 109 + 15 = <b>147</b>"},
+  {l:20, set:{"int[]#1[0]":149}, n:"n[0] = 147 + 2 = <b>149</b>"},
+  {l:21, out:"149 15 147", pop:1, n:"Print → <b>149 15 147</b>। Program শেষ! 🎉"}
+  ]
+},
+
+hw5: {
+  title: "Homework Task 5 (class A + Tester11)",
+  alias: {"A#1":"a1"},
+  cls: `public class A{
+    public int x, y, z = 5;
+    public double p = 0.0;
+    public void methodA(int x, int m) {
+        this.x = methodB(this.x);
+        p = x + this.x % m * 3.0;
+        y = y + methodB(x++, this.x);
+        System.out.println(this.x +" " + x + y + " " + p) ;
+    }
+    public int methodB(int q, int n) {
+        int arr[] = {3,4,5};
+        arr[0] = arr[0] + this.x + n;
+        arr[1] = q + arr[1];
+        System.out.println(arr[0] +" " + arr[1] + " " + arr[2]) ;
+        return arr[1] + arr[2];
+    }
+    public int methodB(int y) {
+        if(y % 2 == 0) {
+            int temp = this.methodB(2, y);
+            return temp;
+        }
+        else{
+            return 4;
+       }
+    }
+}`,
+  drv: `public class Tester11 {
+   public static void main(String [] args){
+       A a1 = new A();
+       a1.methodA(2,3);
+       a1.methodB(5,4);
+   }
+}`,
+  steps: [
+  {d:3, heap:{"A#1":{obj:{x:0,y:0,z:5,p:"0.0"}}}, set:{"$.a1":"→A#1"}, n:"<code>new A()</code> — class-এ কোনো constructor লেখা নেই, তাই Java-র <b>default constructor</b>। x, y-কে value দেওয়া হয়নি → default <b>0</b>; z = 5, p = 0.0।"},
+  {d:4, push:{name:"methodA(int x, int m)",vars:{this:"→A#1",x:2,m:3}}, n:"methodA(2, 3): parameter x = 2 (field x আলাদা!), m = 3।"},
+  {l:5, push:{name:"methodB(int y)",vars:{this:"→A#1",y:0}}, n:"<code>this.x = methodB(this.x)</code> — <b>এক</b> argument, তাই <b>methodB(int y)</b> version। this.x = 0 pass হলো।"},
+  {l:18, n:"0 % 2 == 0 → <b>true</b>, তাই if block-এ ঢুকলাম।"},
+  {l:19, push:{name:"methodB(int q, int n)",vars:{this:"→A#1",q:2,n:0}}, n:"<code>this.methodB(2, y)</code> — <b>দুই</b> argument, তাই <b>methodB(int q, int n)</b>। q = 2, n = 0।"},
+  {l:11, heap:{"int[]#1":{arr:[3,4,5]}}, set:{"$.arr":"→int[]#1"}, n:"local array arr = {3, 4, 5}"},
+  {l:12, set:{"int[]#1[0]":3}, n:"arr[0] = 3 + this.x (0) + n (0) = <b>3</b>"},
+  {l:13, set:{"int[]#1[1]":6}, n:"arr[1] = q + arr[1] = 2 + 4 = <b>6</b>"},
+  {l:14, out:"3 6 5", n:"Print → <b>3 6 5</b>"},
+  {l:15, pop:1, del:["int[]#1"], n:"return arr[1] + arr[2] = 6 + 5 = <b>11</b>"},
+  {l:19, set:{"$.temp":11}, n:"temp = 11"},
+  {l:20, pop:1, n:"return temp → 11"},
+  {l:5, set:{"A#1.x":11}, n:"this.x = <b>11</b>"},
+  {l:6, set:{"A#1.p":"8.0"}, n:"<code>p = x + this.x % m * 3.0</code> — <b>% আর * এর precedence + এর চেয়ে বেশি</b>। 11 % 3 = 2 → 2 * 3.0 = 6.0 → x (param 2) + 6.0 = <b>8.0</b> (double)।"},
+  {l:7, set:{"$.x":3}, push:{name:"methodB(int q, int n)",vars:{this:"→A#1",q:2,n:11}}, n:"<code>y = y + methodB(x++, this.x)</code> — আগে y (0) পড়া হলো। <b>x++ post-increment</b>: পুরনো value <b>2 pass হয়</b>, তারপর local x = 3। this.x = 11। তাই methodB(2, 11)।"},
+  {l:11, heap:{"int[]#2":{arr:[3,4,5]}}, set:{"$.arr":"→int[]#2"}, n:"নতুন local array {3, 4, 5} — প্রতিবার call-এ fresh array।"},
+  {l:12, set:{"int[]#2[0]":25}, n:"arr[0] = 3 + 11 + 11 = <b>25</b>"},
+  {l:13, set:{"int[]#2[1]":6}, n:"arr[1] = 2 + 4 = <b>6</b>"},
+  {l:14, out:"25 6 5", n:"Print → <b>25 6 5</b>"},
+  {l:15, pop:1, del:["int[]#2"], n:"return 6 + 5 = <b>11</b>"},
+  {l:7, set:{"A#1.y":11}, n:"y = 0 + 11 = <b>11</b>"},
+  {l:8, out:"11 311 8.0", pop:1, n:"⚠️ <b>Trap!</b> <code>this.x + \" \" + x + y + ...</code> — একবার String চলে আসলে পরের সব + হলো <b>concatenation</b>। \"11 \" + 3 → \"11 3\", তারপর + 11 → \"11 311\" (যোগ না!)। শেষে \" 8.0\"। Output: <b>11 311 8.0</b>"},
+  {d:5, push:{name:"methodB(int q, int n)",vars:{this:"→A#1",q:5,n:4}}, n:"<code>a1.methodB(5,4)</code> — দুই argument → methodB(int, int)। Return value কেউ ধরে না, ignore হবে।"},
+  {l:11, heap:{"int[]#3":{arr:[3,4,5]}}, set:{"$.arr":"→int[]#3"}, n:"arr = {3, 4, 5}"},
+  {l:12, set:{"int[]#3[0]":18}, n:"arr[0] = 3 + 11 + 4 = <b>18</b>"},
+  {l:13, set:{"int[]#3[1]":9}, n:"arr[1] = 5 + 4 = <b>9</b>"},
+  {l:14, out:"18 9 5", n:"Print → <b>18 9 5</b>"},
+  {l:15, pop:1, del:["int[]#3"], n:"return 14 — main এটা ব্যবহার করে না। Program শেষ! 🎉"}
+  ]
+},
+
+hw6: {
+  title: "Homework Task 6 (class Maze + MazeTester)",
+  alias: {"Maze#1":"m1","Maze#2":"new Maze() (anonymous)"},
+  cls: `public class Maze{
+       public int x;
+       public Maze(){
+          int x = 17;
+          this.methodB(x, -this.x);
+        }
+       public void methodA(){
+            int m = 0, x = 9;
+            m = methodB(m-3)+x;
+            this.x = ++x;
+            System.out.println(this.x+" "+m);
+            this.methodB(x,m);
+            System.out.println(x+" "+(m+this.x));
+            methodB(m);
+        }
+        public int methodB(int y){
+             x=y*y;
+            System.out.println(x+" "+y);
+            return x-11;
+        }
+        public void methodB(int z, int x){
+             z=z-2;
+            x=this.x-2*x;
+            System.out.println(z+" "+this.x);
+        }
+}`,
+  drv: `public class MazeTester{
+    public static void main(String args []){
+        Maze m1 = new Maze();
+        m1.methodA();
+        new Maze().methodB(7,15);
+    }
+}`,
+  steps: [
+  {d:3, heap:{"Maze#1":{obj:{x:0}}}, push:{name:"Maze()  [m1]",vars:{this:"→Maze#1"}}, n:"<code>new Maze()</code> → no-arg constructor call। Field x-এর default value <b>0</b>।"},
+  {l:4, set:{"$.x":17}, n:"local x = 17 (field x এখনো 0)"},
+  {l:5, push:{name:"methodB(int z, int x)",vars:{this:"→Maze#1",z:17,x:0}}, n:"<code>this.methodB(x, -this.x)</code> → (17, -0 = 0)। <b>দুইটা</b> int argument → <b>void methodB(int z, int x)</b>।"},
+  {l:22, set:{"$.z":15}, n:"z = 17 - 2 = <b>15</b>"},
+  {l:23, set:{"$.x":0}, n:"parameter x = this.x - 2*x = 0 - 0 = 0 (field বদলায় না)"},
+  {l:24, out:"15 0", pop:1, n:"Print z, this.x → <b>15 0</b>"},
+  {d:3, pop:1, set:{"$.m1":"→Maze#1"}, n:"Constructor শেষ, m1 = {x: 0}"},
+  {d:4, push:{name:"methodA()  [m1]",vars:{this:"→Maze#1"}}, n:"m1.methodA()"},
+  {l:8, set:{"$.m":0,"$.x":9}, n:"local m = 0, local x = 9"},
+  {l:9, push:{name:"methodB(int y)",vars:{this:"→Maze#1",y:-3}}, n:"<code>methodB(m-3)</code> → methodB(-3)। <b>এক</b> argument → <b>int methodB(int y)</b>।"},
+  {l:17, set:{"Maze#1.x":9}, n:"x = y*y = (-3)*(-3) = 9 — এই method-এ local x নেই, তাই <b>field x = 9</b>"},
+  {l:18, out:"9 -3", n:"Print → <b>9 -3</b>"},
+  {l:19, pop:1, n:"return x - 11 = 9 - 11 = <b>-2</b>"},
+  {l:9, set:{"$.m":7}, n:"m = -2 + x (local 9) = <b>7</b>"},
+  {l:10, set:{"$.x":10,"Maze#1.x":10}, n:"<code>this.x = ++x</code> → pre-increment: local x আগে <b>10</b> হয়, তারপর field x = 10"},
+  {l:11, out:"10 7", n:"Print this.x, m → <b>10 7</b>"},
+  {l:12, push:{name:"methodB(int z, int x)",vars:{this:"→Maze#1",z:10,x:7}}, n:"this.methodB(10, 7) → দুই argument → void version"},
+  {l:22, set:{"$.z":8}, n:"z = 10 - 2 = <b>8</b>"},
+  {l:23, set:{"$.x":-4}, n:"x = this.x - 2*x = 10 - 14 = -4 (parameter-এ, field না)"},
+  {l:24, out:"8 10", pop:1, n:"Print z, this.x → <b>8 10</b>"},
+  {l:13, out:"10 17", n:"Print x (local 10), (m + this.x) = 7 + 10 = 17 → <b>10 17</b>। Parenthesis থাকায় আগে যোগ হলো, concatenation না।"},
+  {l:14, push:{name:"methodB(int y)",vars:{this:"→Maze#1",y:7}}, n:"methodB(7) → int version, return value ignore হবে"},
+  {l:17, set:{"Maze#1.x":49}, n:"x = 7*7 = <b>49</b> (field)"},
+  {l:18, out:"49 7", n:"Print → <b>49 7</b>"},
+  {l:19, pop:1, n:"return 38 — কেউ ব্যবহার করে না"},
+  {l:15, pop:1, n:"methodA শেষ। m1 = {x: 49}"},
+  {d:5, heap:{"Maze#2":{obj:{x:0}}}, push:{name:"Maze()  [new]",vars:{this:"→Maze#2"}}, n:"<code>new Maze()</code> — একদম নতুন object, তার নিজের field x = 0। আবার constructor চলবে!"},
+  {l:4, set:{"$.x":17}, n:"local x = 17"},
+  {l:5, push:{name:"methodB(int z, int x)",vars:{this:"→Maze#2",z:17,x:0}}, n:"methodB(17, 0)"},
+  {l:22, set:{"$.z":15}, n:"z = 15"},
+  {l:23, set:{"$.x":0}, n:"x = 0 - 0 = 0"},
+  {l:24, out:"15 0", pop:1, n:"Print → <b>15 0</b>"},
+  {d:5, pop:1, n:"Constructor শেষ। এই object-এর কোনো variable নাম নেই (<b>anonymous object</b>), সরাসরি তার উপর methodB call হবে।"},
+  {d:5, push:{name:"methodB(int z, int x)  [new]",vars:{this:"→Maze#2",z:7,x:15}}, n:"<code>.methodB(7, 15)</code> → void version"},
+  {l:22, set:{"$.z":5}, n:"z = 7 - 2 = <b>5</b>"},
+  {l:23, set:{"$.x":-30}, n:"x = this.x - 2*x = 0 - 30 = -30"},
+  {l:24, out:"5 0", pop:1, n:"Print z, this.x → <b>5 0</b>। Program শেষ! 🎉"}
+  ]
+},
+
+ug6: {
+  title: "Ungraded Task 6 (class Test3 + Tester3)",
+  alias: {"Test3#1":"t3","int[]#1":"t3.arr"},
+  cls: `public class Test3 {
+   int x = 2, y = 4, sum = 3;
+   int arr[] = {x, y, sum};
+   public void methodA(int x) {
+       arr[0] += methodB(y, this.x) + methodC(x);
+       System.out.println(x + " " + this.x + " " + sum);
+       arr[1] += this.x * (++y) / (sum % x);
+       System.out.println(y + " " + sum + " " + this.x);
+       arr[2] += methodC(x) + methodB(this.x, sum);
+       System.out.println(arr[0] + " " + arr[1] + " " + arr[2]);
+   }
+   public int methodB(int q, int n) {
+       int arr2[] = {7, 8};
+       int a = (arr2[0]++) - q;
+       int b = (++arr2[1]) - n;
+       return a + b;
+   }
+   public int methodC(int z) {
+       z = sum + methodB(x, sum) - z;
+       return z/2;
+   }
+}`,
+  drv: `public class Tester3{
+    public static void main(String [] args){
+        Test3 t3 = new Test3();
+        t3.methodA(7);
+    }
+}`,
+  steps: [
+  {d:3, heap:{"Test3#1":{obj:{x:2,y:4,sum:3,arr:"→int[]#1"}},"int[]#1":{arr:[2,4,3]}}, set:{"$.t3":"→Test3#1"}, n:"Field গুলো <b>উপর থেকে নিচে</b> initialize হয়: x=2, y=4, sum=3, তারপর arr = {x, y, sum} = {2, 4, 3}।"},
+  {d:4, push:{name:"methodA(int x)",vars:{this:"→Test3#1",x:7}}, n:"methodA(7) → parameter x = 7, field x = 2"},
+  {l:5, push:{name:"methodB(int q, int n)",vars:{this:"→Test3#1",q:4,n:2}}, n:"<code>arr[0] += A + B</code> মানে arr[0] = arr[0] + (A + B)। পুরনো arr[0] = <b>2</b> আগেই পড়া হলো। প্রথমে methodB(y, this.x) = methodB(4, 2)।"},
+  {l:13, heap:{"int[]#2":{arr:[7,8]}}, set:{"$.arr2":"→int[]#2"}, n:"arr2 = {7, 8}"},
+  {l:14, set:{"$.a":3,"int[]#2[0]":8}, n:"<code>(arr2[0]++) - q</code> — <b>post</b>-increment: 7 ব্যবহার হয়, পরে arr2[0] = 8। a = 7 - 4 = <b>3</b>"},
+  {l:15, set:{"$.b":7,"int[]#2[1]":9}, n:"<code>(++arr2[1]) - n</code> — <b>pre</b>-increment: আগে 9 হয়, তারপর ব্যবহার। b = 9 - 2 = <b>7</b>"},
+  {l:16, pop:1, del:["int[]#2"], n:"return 3 + 7 = <b>10</b>"},
+  {l:5, push:{name:"methodC(int z)",vars:{this:"→Test3#1",z:7}}, n:"এরপর methodC(x) — এখানে x = parameter <b>7</b>"},
+  {l:19, push:{name:"methodB(int q, int n)",vars:{this:"→Test3#1",q:2,n:3}}, n:"<code>z = sum + methodB(x, sum) - z</code> — methodC-তে local x নেই, তাই x = <b>field 2</b>। methodB(2, 3)।"},
+  {l:13, heap:{"int[]#3":{arr:[7,8]}}, set:{"$.arr2":"→int[]#3"}, n:"নতুন arr2 = {7, 8} (প্রতি call-এ fresh)"},
+  {l:14, set:{"$.a":5,"int[]#3[0]":8}, n:"a = 7 - 2 = <b>5</b>"},
+  {l:15, set:{"$.b":6,"int[]#3[1]":9}, n:"b = 9 - 3 = <b>6</b>"},
+  {l:16, pop:1, del:["int[]#3"], n:"return 5 + 6 = <b>11</b>"},
+  {l:19, set:{"$.z":7}, n:"z = 3 + 11 - 7 = <b>7</b>"},
+  {l:20, pop:1, n:"return 7 / 2 = <b>3</b> (int division — দশমিক বাদ)"},
+  {l:5, set:{"int[]#1[0]":15}, n:"arr[0] = 2 + (10 + 3) = <b>15</b>"},
+  {l:6, out:"7 2 3", n:"Print x (param 7), this.x (2), sum (3) → <b>7 2 3</b>"},
+  {l:7, set:{"Test3#1.y":5,"int[]#1[1]":7}, n:"<code>arr[1] += this.x * (++y) / (sum % x)</code> → ++y: y = 5। 2 * 5 = 10। sum % x = 3 % 7 = 3। 10 / 3 = <b>3</b> (int)। arr[1] = 4 + 3 = <b>7</b>"},
+  {l:8, out:"5 3 2", n:"Print y, sum, this.x → <b>5 3 2</b>"},
+  {l:9, push:{name:"methodC(int z)",vars:{this:"→Test3#1",z:7}}, n:"পুরনো arr[2] = 3 পড়া হলো। প্রথমে methodC(7)"},
+  {l:19, push:{name:"methodB(int q, int n)",vars:{this:"→Test3#1",q:2,n:3}}, n:"methodB(field x = 2, sum = 3)"},
+  {l:13, heap:{"int[]#4":{arr:[7,8]}}, set:{"$.arr2":"→int[]#4"}, n:"arr2 = {7, 8}"},
+  {l:14, set:{"$.a":5,"int[]#4[0]":8}, n:"a = 7 - 2 = 5"},
+  {l:15, set:{"$.b":6,"int[]#4[1]":9}, n:"b = 9 - 3 = 6"},
+  {l:16, pop:1, del:["int[]#4"], n:"return <b>11</b>"},
+  {l:19, set:{"$.z":7}, n:"z = 3 + 11 - 7 = 7"},
+  {l:20, pop:1, n:"return 7/2 = <b>3</b>"},
+  {l:9, push:{name:"methodB(int q, int n)",vars:{this:"→Test3#1",q:2,n:3}}, n:"এবার methodB(this.x, sum) = methodB(2, 3)"},
+  {l:13, heap:{"int[]#5":{arr:[7,8]}}, set:{"$.arr2":"→int[]#5"}, n:"arr2 = {7, 8}"},
+  {l:14, set:{"$.a":5,"int[]#5[0]":8}, n:"a = 5"},
+  {l:15, set:{"$.b":6,"int[]#5[1]":9}, n:"b = 6"},
+  {l:16, pop:1, del:["int[]#5"], n:"return <b>11</b>"},
+  {l:9, set:{"int[]#1[2]":17}, n:"arr[2] = 3 + (3 + 11) = <b>17</b>"},
+  {l:10, out:"15 7 17", pop:1, n:"Print arr → <b>15 7 17</b>। Program শেষ! 🎉"}
+  ]
+}
+};
+
+</script>
+<script>
+// ================= Engine =================
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function computeStates(p){
+  let st = {frames:[{name:"main()", vars:{}}], heap:{}, out:[], changed:[]};
+  const states = [clone(st)];
+  p.steps.forEach(s => {
+    st = clone(st); const ch = [];
+    if (s.heap) for (const k in s.heap){ st.heap[k] = clone(s.heap[k]); ch.push("h:"+k); }
+    for (let i=0;i<(s.pop||0);i++) st.frames.pop();
+    (s.del||[]).forEach(k => delete st.heap[k]);
+    if (s.set) for (const k in s.set){
+      const v = s.set[k];
+      if (k.startsWith("$.")) { const fi = st.frames.length-1; st.frames[fi].vars[k.slice(2)] = v; ch.push("f"+fi+"."+k.slice(2)); }
+      else {
+        const m = k.match(/^(.+)\[(\d+)\]$/);
+        if (m) { st.heap[m[1]].arr[+m[2]] = v; ch.push("h:"+m[1]+"["+m[2]+"]"); }
+        else { const i = k.lastIndexOf("."); st.heap[k.slice(0,i)].obj[k.slice(i+1)] = v; ch.push("h:"+k); }
+      }
+    }
+    if (s.push){ st.frames.push(clone(s.push)); ch.push("frame"+(st.frames.length-1)); }
+    if (s.out !== undefined) st.out.push(s.out);
+    st.changed = ch; states.push(st);
+  });
+  return states;
+}
+if (typeof module !== "undefined") module.exports = {computeStates};
+if (typeof document === "undefined") { /* node test mode */ }
+else {
+
+// ================= Helpers =================
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const KW = /\b(public|private|protected|class|static|void|int|double|float|boolean|char|long|String|new|return|if|else|for|while|this|null|true|false)\b/;
+function hlJava(src){
+  const re = /(\/\/.*$)|("(?:\\.|[^"\\])*")|('(?:\\.|[^'\\])')|\b(public|private|protected|class|static|void|int|double|float|boolean|char|long|String|new|return|if|else|for|while|this|null|true|false)\b|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_]\w*(?=\s*\())/gm;
+  let out = "", last = 0, m;
+  while ((m = re.exec(src))){
+    out += esc(src.slice(last, m.index));
+    const t = esc(m[0]);
+    if (m[1]) out += `<span class="tk-c">${t}</span>`;
+    else if (m[2]||m[3]) out += `<span class="tk-s">${t}</span>`;
+    else if (m[4]) out += `<span class="tk-k">${t}</span>`;
+    else if (m[5]) out += `<span class="tk-n">${t}</span>`;
+    else if (m[6]) out += `<span class="tk-f">${t}</span>`;
+    last = m.index + m[0].length;
+  }
+  return out + esc(src.slice(last));
+}
+function lineCode(p, s){
+  const lines = s.l ? p.cls.split("\n") : p.drv.split("\n");
+  const n = s.l || s.d;
+  return (lines[n-1]||"").trim();
+}
+function al(p,k){ return (p.alias && p.alias[k]) ? p.alias[k] : k; }
+function showVal(p,v){ v = String(v); return v.startsWith("→") ? "→"+al(p, v.slice(1)) : v; }
+function changeText(p, s){
+  const parts = [];
+  if (s.heap) for (const k in s.heap){
+    const h = s.heap[k];
+    const body = h.arr ? "{"+h.arr.join(", ")+"}" : "{"+Object.entries(h.obj).map(([a,b])=>a+"="+showVal(p,b)).join(", ")+"}";
+    parts.push(`<span class="ch-new">new ${esc(al(p,k))}</span> ${esc(body)}`);
+  }
+  if (s.set) for (const k in s.set){
+    let label;
+    if (k.startsWith("$.")) label = `<span class="ch-loc">local</span> ${esc(k.slice(2))}`;
+    else { const m = k.match(/^(.+)\[(\d+)\]$/);
+      label = m ? `<span class="ch-fld">${esc(al(p,m[1]))}[${m[2]}]</span>` : `<span class="ch-fld">${esc(al(p,k.slice(0,k.lastIndexOf("."))))}.${esc(k.slice(k.lastIndexOf(".")+1))}</span>`; }
+    parts.push(`${label} = <b>${esc(showVal(p, s.set[k]))}</b>`);
+  }
+  if (s.push){
+    const args = Object.entries(s.push.vars).filter(([k])=>k!=="this").map(([k,v])=>k+"="+showVal(p,v)).join(", ");
+    parts.push(`<span class="ch-call">📞 ${esc(s.push.name.split("  ")[0])}</span>${args?" ("+esc(args)+")":""}`);
+  }
+  if (s.pop) parts.push(`<span class="ch-ret">↩ return</span>`);
+  return parts.join("<br>") || "—";
+}
+
+// ================= Static code highlighting =================
+document.querySelectorAll("pre.java code").forEach(c => { c.innerHTML = hlJava(c.textContent); });
+document.querySelectorAll(".copy-btn").forEach(b => b.addEventListener("click", () => {
+  const code = b.closest(".codewrap").querySelector("code").textContent;
+  navigator.clipboard && navigator.clipboard.writeText(code).then(()=>{ b.textContent="Copied ✓"; setTimeout(()=>b.textContent="Copy",1400); });
+}));
+
+// ================= Trace tables =================
+function numbered(src, tag){
+  return src.split("\n").map((ln,i)=>`<div class="ln" data-${tag}="${i+1}"><span class="no">${i+1}</span><span class="tx">${hlJava(ln)||" "}</span></div>`).join("");
+}
+document.querySelectorAll("[data-trace]").forEach(el => {
+  const id = el.dataset.trace, p = PROBS[id], states = computeStates(p);
+  const finalOut = states[states.length-1].out;
+  let rows = p.steps.map((s,i)=>`<tr>
+    <td class="c-n">${i+1}</td>
+    <td class="c-l">${s.l ? "L"+s.l : "main:"+s.d}</td>
+    <td class="c-code"><code>${hlJava(lineCode(p,s))}</code></td>
+    <td class="c-ch">${changeText(p,s)}</td>
+    <td class="c-o">${s.out!==undefined ? `<span class="outpill">${esc(s.out)}</span>` : ""}</td>
+    <td class="c-note">${s.n}</td></tr>`).join("");
+  const maxCols = Math.max(...finalOut.map(o=>o.split(" ").length));
+  const outGrid = finalOut.map(o=>{ const c=o.split(" "); return "<tr>"+Array.from({length:maxCols},(_,i)=>`<td>${esc(c[i]??"")}</td>`).join("")+"</tr>"; }).join("");
+  el.innerHTML = `
+   <div class="tracecode">
+     <div><div class="tc-h">Class code</div><div class="numcode">${numbered(p.cls,"l")}</div></div>
+     <div><div class="tc-h">Driver code (main)</div><div class="numcode">${numbered(p.drv,"d")}</div></div>
+   </div>
+   <h4>📋 Trace table (step by step)</h4>
+   <p class="hint">L = class-এর line number, main:n = driver code-এর line। "local" = method-এর ভেতরের variable, <span class="ch-fld">obj.field</span> = object-এর instance variable।</p>
+   <div class="tablewrap"><table class="trace"><thead><tr><th>#</th><th>Line</th><th>Code</th><th>Variable changes</th><th>Output</th><th>কী হচ্ছে (explanation)</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="final">
+     <div><h4>✅ Final Output (exam format)</h4><table class="outgrid">${outGrid}</table></div>
+     <div class="final-act"><button class="btn primary" onclick="openLab('${id}')">▶ Tracing Lab-এ step-by-step দেখো</button></div>
+   </div>`;
+});
+
+// ================= Tracing Lab =================
+const lab = { id:null, states:[], i:0, timer:null };
+const $ = s => document.querySelector(s);
+const sel = $("#labSel");
+Object.keys(PROBS).forEach(k => { const o = document.createElement("option"); o.value=k; o.textContent=PROBS[k].title; sel.appendChild(o); });
+sel.addEventListener("change", ()=> loadLab(sel.value));
+
+function loadLab(id){
+  stopPlay();
+  lab.id = id; const p = PROBS[id]; lab.states = computeStates(p); lab.i = 0;
+  sel.value = id;
+  $("#labCls").innerHTML = numbered(p.cls,"l");
+  $("#labDrv").innerHTML = numbered(p.drv,"d");
+  $("#labRange").max = p.steps.length; $("#labRange").value = 0;
+  $("#practiceIn").value = ""; $("#practiceRes").innerHTML = "";
+  renderLab();
+}
+function renderLab(){
+  const p = PROBS[lab.id], st = lab.states[lab.i], s = p.steps[lab.i-1];
+  $("#labCount").textContent = `Step ${lab.i} / ${p.steps.length}`;
+  $("#labRange").value = lab.i;
+  document.querySelectorAll("#labCls .ln, #labDrv .ln").forEach(x=>x.classList.remove("on"));
+  if (s){
+    const box = s.l ? $("#labCls") : $("#labDrv");
+    const ln = box.querySelector(`.ln[data-${s.l?"l":"d"}="${s.l||s.d}"]`);
+    if (ln){ ln.classList.add("on"); box.scrollTop = ln.offsetTop - box.clientHeight/2 + 12; }
+    $("#labNote").innerHTML = `<div class="note-line">${s.l?"Class line "+s.l:"main line "+s.d}: <code>${hlJava(lineCode(p,s))}</code></div><div>${s.n}</div>`;
+  } else {
+    $("#labNote").innerHTML = `<div>শুরু করতে <b>Next ▶</b> চাপো (বা keyboard-এর → arrow)। প্রতিটা step-এ দেখবে কোন line চলছে, কোন variable বদলাচ্ছে, আর কী print হচ্ছে।</div><div class="tiny">Tip: আগে নিজে খাতায় trace করো, তারপর এখানে মিলিয়ে নাও। নিচের "Practice" box-এ নিজের answer লিখে check করতে পারবে।</div>`;
+  }
+  // stack
+  const ch = new Set(st.changed);
+  $("#labStack").innerHTML = st.frames.map((f,fi)=>({f,fi})).reverse().map(({f,fi})=>`
+    <div class="frame ${fi===st.frames.length-1?"top":""} ${ch.has("frame"+fi)?"flash":""}">
+      <div class="fh">${esc(f.name)}${fi===st.frames.length-1?' <span class="badge">running</span>':""}</div>
+      ${Object.keys(f.vars).length? Object.entries(f.vars).map(([k,v])=>`<div class="vr ${ch.has("f"+fi+"."+k)?"flash":""}"><span>${esc(k)}</span><span>${esc(showVal(p,v))}</span></div>`).join("") : '<div class="vr empty">no local variables</div>'}
+    </div>`).join("");
+  // heap
+  const hk = Object.keys(st.heap);
+  $("#labHeap").innerHTML = hk.length ? hk.map(k=>{
+    const h = st.heap[k];
+    const name = p.alias && p.alias[k] ? `${esc(p.alias[k])} <span class="tiny">(${esc(k)})</span>` : esc(k);
+    if (h.arr) return `<div class="hobj ${ch.has("h:"+k)?"flash":""}"><div class="fh">${name}</div><div class="arr">${h.arr.map((v,i)=>`<div class="cell ${ch.has("h:"+k+"["+i+"]")?"flash":""}"><span class="idx">${i}</span>${esc(v)}</div>`).join("")}</div></div>`;
+    return `<div class="hobj ${ch.has("h:"+k)?"flash":""}"><div class="fh">${name}</div>${Object.entries(h.obj).map(([f,v])=>`<div class="vr ${ch.has("h:"+k+"."+f)?"flash":""}"><span>${esc(f)}</span><span>${esc(showVal(p,v))}</span></div>`).join("")}</div>`;
+  }).join("") : '<div class="vr empty">heap খালি</div>';
+  // output
+  $("#labOut").innerHTML = st.out.length ? st.out.map((o,i)=>`<div class="${(s&&s.out!==undefined&&i===st.out.length-1)?"newout":""}">${esc(o)}</div>`).join("") : '<div class="muted">// এখনো কিছু print হয়নি</div>';
+  $("#labPrev").disabled = lab.i===0; $("#labNext").disabled = lab.i===p.steps.length;
+}
+function go(n){ lab.i = Math.max(0, Math.min(PROBS[lab.id].steps.length, n)); renderLab(); }
+function stopPlay(){ if (lab.timer){ clearInterval(lab.timer); lab.timer=null; $("#labPlay").textContent="⏵ Auto play"; } }
+$("#labPrev").onclick = ()=>{ stopPlay(); go(lab.i-1); };
+$("#labNext").onclick = ()=>{ stopPlay(); go(lab.i+1); };
+$("#labFirst").onclick = ()=>{ stopPlay(); go(0); };
+$("#labLast").onclick = ()=>{ stopPlay(); go(PROBS[lab.id].steps.length); };
+$("#labRange").oninput = e => { stopPlay(); go(+e.target.value); };
+$("#labNextOut").onclick = ()=>{ stopPlay(); const st=PROBS[lab.id].steps; let j=lab.i; while(j<st.length){ j++; if(st[j-1].out!==undefined) break; } go(j); };
+$("#labPlay").onclick = ()=>{
+  if (lab.timer) return stopPlay();
+  if (lab.i===PROBS[lab.id].steps.length) go(0);
+  $("#labPlay").textContent = "⏸ Pause";
+  lab.timer = setInterval(()=>{ if (lab.i>=PROBS[lab.id].steps.length) return stopPlay(); go(lab.i+1); }, +$("#labSpeed").value);
+};
+document.addEventListener("keydown", e => {
+  if (["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName)) return;
+  const r = $("#lab").getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+  if (e.key==="ArrowRight"){ stopPlay(); go(lab.i+1); e.preventDefault(); }
+  if (e.key==="ArrowLeft"){ stopPlay(); go(lab.i-1); e.preventDefault(); }
+});
+$("#practiceBtn").onclick = ()=>{
+  const want = lab.states[lab.states.length-1].out;
+  const got = $("#practiceIn").value.split("\n").map(x=>x.trim().replace(/\s+/g," ")).filter(x=>x!=="");
+  let ok = 0;
+  const rows = want.map((w,i)=>{ const g = got[i] ?? ""; const good = g===w; if(good) ok++;
+    return `<tr class="${good?"ok":"bad"}"><td>${i+1}</td><td>${esc(g)||"<i>(empty)</i>"}</td><td>${good?"✔":"✘ → "+esc(w)}</td></tr>`; }).join("");
+  $("#practiceRes").innerHTML = `<div class="score">${ok}/${want.length} line সঠিক ${ok===want.length?"🎉 Perfect!":"— ভুলগুলো step-by-step চালিয়ে দেখো কোথায় মিস হলো।"}</div><table class="ptab"><tr><th>#</th><th>তোমার answer</th><th>Result</th></tr>${rows}</table>`;
+};
+$("#practiceHide").onclick = ()=>{ $("#labOutWrap").classList.toggle("hidden-out"); $("#practiceHide").textContent = $("#labOutWrap").classList.contains("hidden-out") ? "👁 Output দেখাও" : "🙈 Output লুকাও (practice)"; };
+window.openLab = id => { loadLab(id); $("#lab").scrollIntoView({behavior:"smooth"}); };
+loadLab("cw5");
+
+// nav active highlight
+const navLinks = [...document.querySelectorAll(".toc a")];
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ navLinks.forEach(a=>a.classList.toggle("act", a.getAttribute("href")==="#"+e.target.id)); } }), {rootMargin:"-40% 0px -55% 0px"});
+document.querySelectorAll("section[id], article[id]").forEach(s=>obs.observe(s));
+}
+
+</script>
+</body>
+</html>

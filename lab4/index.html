@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE111 Lab 4: Reference Passing &amp; Multi-class (Guide + Tracing Lab)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ef; --paper:#fffdf8; --ink:#1d2433; --muted:#5b6475; --line:#e3ddd0;
+  --accent:#d9480f; --accent2:#0b7a75; --blue:#1c4fa0; --gold:#f2b705;
+  --code:#141a26; --codeink:#e6e9f0;
+  --sans:"Hind Siliguri","Segoe UI",system-ui,sans-serif; --mono:"JetBrains Mono",Consolas,monospace; --disp:"Space Grotesk","Hind Siliguri",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.7}
+code{font-family:var(--mono);font-size:.88em;background:#efe9dc;padding:1px 5px;border-radius:4px}
+a{color:var(--blue)}
+/* hero */
+.hero{background:var(--code);color:#fff;padding:56px 24px 48px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:
+ repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 48px),
+ repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 48px)}
+.hero-in{max-width:1180px;margin:0 auto;position:relative}
+.tag{display:inline-block;font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;color:var(--gold);border:1px solid rgba(242,183,5,.5);padding:3px 10px;border-radius:99px}
+.hero h1{font-family:var(--disp);font-size:clamp(30px,5vw,54px);line-height:1.08;margin:16px 0 12px;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p{color:#c7cede;max-width:720px;margin:0 0 22px}
+.hero-links{display:flex;flex-wrap:wrap;gap:10px}
+.hero-links a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:7px 14px;border-radius:8px;font-size:15px}
+.hero-links a.main{background:var(--accent);border-color:var(--accent);font-weight:600}
+/* layout */
+.wrap{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:230px 1fr;gap:34px;padding:30px 24px 80px}
+.toc{position:sticky;top:16px;align-self:start;font-size:14.5px;max-height:calc(100vh - 32px);overflow:auto}
+.toc .th{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin:16px 0 6px}
+.toc a{display:block;color:var(--ink);text-decoration:none;padding:3px 10px;border-left:2px solid var(--line)}
+.toc a:hover{background:#efe9dc}
+.toc a.act{border-left-color:var(--accent);color:var(--accent);font-weight:600}
+.toc a.lablink{margin-top:14px;background:var(--accent2);color:#fff;border-radius:8px;border:0;padding:8px 12px;font-weight:600}
+main{min-width:0}
+section{margin-bottom:56px}
+h2{font-family:var(--disp);font-size:32px;letter-spacing:-.01em;margin:10px 0 18px;padding-bottom:10px;border-bottom:3px solid var(--ink)}
+h2 .num{font-family:var(--mono);color:var(--accent);font-size:.6em;vertical-align:middle;margin-right:8px}
+h3{font-family:var(--disp);font-size:23px;margin:0 0 14px}
+h4{margin:18px 0 8px;font-size:17px}
+.lead{font-size:17.5px;color:#39404e}
+/* concept cards */
+.concept{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0 16px}
+.pill-card{background:#f3efe6;border-radius:10px;padding:12px 14px;font-size:15px}
+.rule{background:#fff6ec;border-left:4px solid var(--accent);padding:4px 16px;border-radius:0 10px 10px 0}
+.rule ul{padding-left:20px}
+.warn{background:#fff1ee;border:1px solid #f4c6b8;padding:12px 14px;border-radius:10px}
+.tip{background:#e9f6f4;border:1px solid #b9e2dc;padding:12px 14px;border-radius:10px}
+table.mini{border-collapse:collapse;font-size:15px;margin:8px 0;width:100%}
+table.mini th,table.mini td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+table.mini th{background:#efe9dc}
+.tips{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:12px 0}
+.tipc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px 14px 10px;font-size:15px}
+.tipc h4{margin:10px 0 4px}
+.tipc p{margin:0}
+/* tasks */
+.task{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px;margin:22px 0;box-shadow:0 1px 0 var(--line)}
+.blk{border-radius:12px;padding:12px 18px;margin:12px 0}
+.blk-h{font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;font-family:var(--disp)}
+.blk.q{background:#f1f4fb;border:1px solid #d5ddef}.blk.q .blk-h{color:var(--blue)}
+.blk.e{background:#fff7e8;border:1px solid #f1dfb7}.blk.e .blk-h{color:#a15c00}
+.blk.s{background:#eef8f5;border:1px solid #c5e6de}.blk.s .blk-h{color:var(--accent2)}
+.blk ul{padding-left:22px;margin:6px 0}
+details{margin:10px 0}
+summary{cursor:pointer;font-weight:600;color:var(--muted);font-size:15px}
+/* code */
+.codewrap{position:relative;margin:10px 0}
+.code-title{font-family:var(--mono);font-size:12px;color:#9aa4b8;background:#0d121b;padding:6px 14px;border-radius:10px 10px 0 0}
+.code-title + .copy-btn + pre, .code-title + pre{border-radius:0 0 10px 10px}
+pre{margin:0}
+pre.java{background:var(--code);color:var(--codeink);padding:14px 16px;border-radius:10px;overflow:auto;font-size:13.5px;line-height:1.6}
+pre.java code{background:none;padding:0;font-size:inherit;color:inherit}
+.copy-btn{position:absolute;right:8px;top:4px;font-size:12px;background:#2a3346;color:#cfd6e4;border:0;border-radius:6px;padding:3px 10px;cursor:pointer;z-index:2}
+.tk-k{color:#ff9e64}.tk-s{color:#9ece6a}.tk-n{color:#e0af68}.tk-c{color:#6b7591;font-style:italic}.tk-f{color:#7dcfff}
+pre.output{background:#0f1720;color:#b8f7c4;padding:12px 16px;border-radius:10px;font-family:var(--mono);font-size:13px;overflow:auto;line-height:1.55}
+/* trace */
+.tracecode{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin:8px 0 6px}
+.tc-h{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px}
+.numcode{background:var(--code);color:var(--codeink);border-radius:10px;padding:8px 0;font-family:var(--mono);font-size:12.8px;line-height:1.55;overflow:auto;max-height:520px}
+.ln{display:flex;white-space:pre;padding:0 10px 0 0}
+.ln .no{width:34px;flex:none;text-align:right;padding-right:10px;color:#5d6780;user-select:none}
+.ln.on{background:rgba(242,183,5,.22);box-shadow:inset 3px 0 0 var(--gold)}
+.hint{font-size:14px;color:var(--muted);margin:0 0 8px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:640px}
+table.trace{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+table.trace th{position:sticky;top:0;background:var(--ink);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:13px;z-index:1}
+table.trace td{border-bottom:1px solid #eee7da;padding:7px 10px;vertical-align:top}
+table.trace tr:nth-child(even) td{background:#fbf9f4}
+.c-n{color:var(--muted);font-family:var(--mono);font-size:12px}
+.c-l{font-family:var(--mono);font-size:12px;white-space:nowrap;color:var(--blue)}
+.c-code{min-width:190px;max-width:230px}.c-code code{background:var(--code);color:var(--codeink);white-space:pre-wrap;word-break:break-word;display:inline-block;font-size:12px}
+.c-o{width:1%;white-space:nowrap}.c-ch{max-width:240px;min-width:180px}.task .numcode{max-height:none}
+.c-ch{font-family:var(--mono);font-size:12.3px}
+.c-note{min-width:250px;font-size:14px}
+.ch-loc{color:#7a4cc2}.ch-fld{color:var(--accent);font-weight:600}.ch-new{color:var(--accent2);font-weight:600}.ch-call{color:var(--blue);font-weight:600}.ch-ret{color:#888}
+.outpill{background:#0f1720;color:#b8f7c4;font-family:var(--mono);font-size:12.5px;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.final{display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;margin-top:10px}
+table.outgrid{border-collapse:collapse;font-family:var(--mono)}
+table.outgrid td{border:2px solid var(--ink);min-width:62px;height:34px;text-align:center;font-weight:600;background:#fff}
+.btn{font-family:var(--sans);font-size:15px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent2);color:#fff;border-color:var(--accent2);font-weight:600}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+/* LAB */
+#lab{background:#10151f;color:#e8ecf3;border-radius:22px;padding:28px;margin-top:20px}
+#lab h2{color:#fff;border-color:var(--gold)}
+#lab .lead{color:#b7c0d1}
+.lab-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#1a2130;border-radius:12px;padding:10px 12px;margin-bottom:14px;position:sticky;top:8px;z-index:5}
+.lab-bar select{font-family:var(--sans);font-size:15px;padding:7px 10px;border-radius:8px;background:#0f1520;color:#fff;border:1px solid #344058}
+.lab-bar .btn{background:#26304a;color:#e8ecf3;border-color:#344058}
+.lab-bar .btn.primary{background:var(--gold);color:#111;border-color:var(--gold)}
+#labCount{font-family:var(--mono);font-size:13px;color:var(--gold);min-width:110px}
+#labRange{flex:1;min-width:140px;accent-color:var(--gold)}
+.lab-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
+.panel{background:#161d2b;border:1px solid #273148;border-radius:14px;padding:12px 14px;min-width:0}
+.panel-h{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#8d99b3;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+#lab .numcode{max-height:330px;background:#0c1018}
+#labNote{background:#232c40;border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:12px 16px;min-height:96px;font-size:15.5px;margin-bottom:14px}
+#labNote code{background:#0c1018;color:#e6e9f0}
+#labNote b{color:var(--gold)}
+.note-line{font-size:13px;color:#9aa6bf;margin-bottom:4px}
+.tiny{font-size:12.5px;color:#8d99b3}
+.frame,.hobj{background:#0f1520;border:1px solid #2c3750;border-radius:10px;margin-bottom:8px;overflow:hidden}
+.frame.top{border-color:var(--gold)}
+.fh{background:#1e273a;padding:5px 10px;font-family:var(--mono);font-size:12.5px;color:#cdd6e8}
+.badge{background:var(--gold);color:#111;font-size:10.5px;padding:1px 6px;border-radius:99px;margin-left:6px}
+.vr{display:flex;justify-content:space-between;padding:3px 10px;font-family:var(--mono);font-size:13px;border-top:1px solid #1f283a}
+.vr span:last-child{color:#9ece6a;font-weight:600}
+.vr.empty{color:#66728c;justify-content:center;font-family:var(--sans)}
+.arr{display:flex;gap:4px;padding:8px 10px;flex-wrap:wrap}
+.cell{border:1px solid #3a4865;min-width:44px;text-align:center;font-family:var(--mono);padding:2px 6px 3px;border-radius:6px;position:relative;color:#9ece6a;font-weight:600}
+.cell .idx{display:block;font-size:10px;color:#6b7896;font-weight:400}
+.flash{animation:fl 1.2s ease}
+.vr.flash,.cell.flash{background:rgba(242,183,5,.25)}
+@keyframes fl{0%{box-shadow:0 0 0 3px rgba(242,183,5,.8)}100%{box-shadow:0 0 0 0 rgba(242,183,5,0)}}
+#labOut{background:#06090f;border-radius:10px;padding:10px 14px;font-family:var(--mono);font-size:14px;color:#b8f7c4;min-height:120px}
+#labOut .newout{background:rgba(184,247,196,.15);border-radius:4px}
+#labOut .muted{color:#4f5b73}
+.hidden-out #labOut{filter:blur(7px);user-select:none}
+.side-stack{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.practice{margin-top:14px}
+.practice textarea{width:100%;min-height:120px;background:#06090f;color:#e8ecf3;border:1px solid #344058;border-radius:10px;padding:10px;font-family:var(--mono);font-size:14px}
+.practice .btn{background:#26304a;color:#e8ecf3;border-color:#344058}
+.practice .btn.primary{background:var(--accent2);border-color:var(--accent2)}
+.score{margin:10px 0 6px;font-weight:600}
+.ptab{border-collapse:collapse;font-family:var(--mono);font-size:13px}
+.ptab td,.ptab th{border:1px solid #2c3750;padding:4px 10px}
+.ptab tr.ok td{color:#9ece6a}.ptab tr.bad td{color:#ff8a80}
+.kbd{font-family:var(--mono);background:#26304a;border-radius:4px;padding:0 6px;font-size:12px}
+footer{text-align:center;color:var(--muted);font-size:14px;padding:30px}
+@media (max-width:1000px){
+  .wrap{grid-template-columns:1fr}.toc{display:none}
+  .grid2,.tracecode,.lab-grid,.side-stack{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr}
+  #lab{padding:16px;border-radius:14px}
+}
+
+@media print{
+  @page{size:A4;margin:12mm 10mm}
+  body{background:#fff;font-size:12.5px;line-height:1.55}
+  .toc,#lab,.hero-links,.copy-btn,.final-act,footer{display:none!important}
+  .wrap{display:block;padding:0;max-width:none}
+  .hero{padding:22px 18px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hero h1{font-size:30px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  section{margin-bottom:10px}
+  h2{font-size:22px;break-after:avoid}
+  .task{box-shadow:none;padding:12px 14px;border-radius:8px;margin:14px 0}
+  .task h3{break-after:avoid}
+  .concept{padding:12px 16px}
+  pre.java,.numcode,.code-title{background:#f6f4ee!important;color:#1d2433!important;border:1px solid #ddd6c6}
+  .ln .no{color:#9a9384}
+  .tk-k{color:#b4400a}.tk-s{color:#2e7d32}.tk-n{color:#9a6700}.tk-c{color:#888}.tk-f{color:#1c4fa0}
+  pre.output{background:#f1f8f2!important;color:#14532d!important;border:1px solid #c8e3cc}
+  .c-code{display:none}
+  table.trace th:nth-child(3){display:none}
+  .c-ch{max-width:none;min-width:170px}
+  .outpill{background:#e8f5e9;color:#14532d;border:1px solid #9cc9a3}
+  .hero{background:#1d2433!important}
+  .blk{break-inside:auto}
+  pre.java,pre.output{white-space:pre-wrap;word-break:break-word;font-size:11px;overflow:visible}
+  .numcode,.tablewrap,.task .numcode{max-height:none!important;overflow:visible!important}
+  .numcode{font-size:10.5px}
+  .tracecode{grid-template-columns:1.3fr 1fr}
+  table.trace{font-size:10.5px}
+  table.trace th{position:static}
+  table.trace tr{break-inside:avoid}
+  .c-code{min-width:0;max-width:150px}.c-code code{font-size:9.5px}
+  .c-ch{font-size:9.5px;min-width:0;max-width:150px}
+  .c-note{min-width:0;font-size:10.5px}
+  .outpill{font-size:9.5px}
+  .final{break-inside:avoid}
+  .grid2{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-in">
+  <span class="tag">CSE111 · PROGRAMMING LANGUAGE II · LAB 04</span>
+  <h1>Reference Passing, <em>Multi-class</em><br>&amp; Tracing: পুরো গাইড</h1>
+  <p>Reference passing আর multi-class-এর basic concept বাংলা + English mix-এ, তারপর assignment-এর প্রতিটা problem: question → হালকা explanation → solution। Tracing task-এ step-by-step trace table, আর শেষে interactive <b>Tracing Lab</b>। সব solution driver code চালিয়ে output মিলিয়ে দেখা হয়েছে।</p>
+  <div class="hero-links">
+    <a href="#basics">📘 Basics</a><a href="#classwork">🧪 Classwork</a><a href="#homework">🏠 Homework</a><a href="#ungraded">⭐ Ungraded</a><a class="main" href="#lab">▶ Tracing Lab</a>
+  </div>
+</div></header>
+
+<div class="wrap">
+<nav class="toc">
+  <div class="th">Basics</div>
+  <a href="#basics">Primitive vs Reference</a>
+  <a href="#b-pass">Reference passing</a>
+  <a href="#b-this">this কে?</a>
+  <a href="#b-multi">Multi-class</a>
+  <a href="#b-tips">Tracing cheat-sheet</a>
+  <div class="th">Classwork</div>
+  <a href="#cw1">T1 · Triangle</a><a href="#cw2">T2 · Shop</a><a href="#cw3">T3 · Teacher &amp; Course</a><a href="#cw4">T4 · Team &amp; Player</a><a href="#cw5">T5 · Tracing (Trace)</a>
+  <div class="th">Homework</div>
+  <a href="#hw1">T1 · Player</a><a href="#hw2">T2 · Student</a><a href="#hw3">T3 · TravelPrep</a><a href="#hw4">T4 · Student &amp; Connect</a><a href="#hw5">T5 · Tracing (QuizA)</a><a href="#hw6">T6 · Tracing (A)</a>
+  <div class="th">Ungraded</div>
+  <a href="#ug1">T1 · Taxi</a><a href="#ug2">T2 · ConnectFriends</a><a href="#ug3">T3 · Cart</a><a href="#ug4">T4 · Taxi &amp; Passenger</a><a href="#ug5">T5 · Tracing (TracingX)</a><a href="#ug6">T6 · Tracing (TestX)</a>
+  <a class="lablink" href="#lab">▶ Tracing Lab</a>
+</nav>
+
+<main>
+
+<section id="basics"><h2><span class="num">01</span> Basics: Reference Passing &amp; Multi-class</h2><p class="lead">এই lab-এর দুইটা মূল idea: <b>Reference Passing</b> (object বা array method-এ পাঠালে আসলে কী যায়) আর <b>Multi-class problem</b> (একাধিক class একসাথে কাজ করে, এক class-এর ভেতরে আরেক class-এর object থাকে)। এগুলো পরিষ্কার হলে tracing-ও সহজ হয়ে যাবে।</p>
+
+<div class="concept" id="b-ref">
+<h3>1. Primitive variable vs Reference variable</h3>
+<div class="grid2">
+<div>
+<p><b>Primitive</b> (<code>int, double, char, boolean</code>): variable-এর ভেতরে সরাসরি <b>value</b> থাকে।</p>
+<p><b>Reference</b> (যেকোনো object, array, String): variable-এর ভেতরে object থাকে না, থাকে object-এর <b>address (reference)</b>। Object নিজে থাকে <b>heap</b>-এ।</p>
+<p class="tip">🔎 ভাবো এভাবে: reference variable হলো একটা <b>remote control</b>, আর object হলো TV। দুইটা remote একই TV control করতে পারে।</p>
+</div>
+<div class="codewrap"><div class="code-title">Example</div><pre class="java"><code>int a = 5;
+int b = a;      // value copy
+b = 10;         // a এখনো 5
+
+Triangle t1 = new Triangle(4, 4, 4);
+Triangle t2 = t1;   // address copy → একই object!
+t2.a = 9;           // t1.a-ও এখন 9</code></pre></div>
+</div>
+</div>
+
+<div class="concept">
+<h3>2. Object assignment আর <code>==</code></h3>
+<div class="grid2">
+<div><ul>
+<li><code>t1 = t2;</code>: নতুন object তৈরি হয় না, t1 এখন t2-এর object-টাকেই point করে। t1-এর পুরনো object-এর কাছে আর কেউ না থাকলে সেটা garbage হয়ে যায়।</li>
+<li><code>t1 == t2</code>: <b>address</b> compare করে, মানে দুইটা কি একই object? Field গুলোর value এক হলেও আলাদা object হলে <b>false</b>।</li>
+<li>Field দিয়ে compare করতে হলে নিজে করতে হবে: <code>a == other.a && b == other.b ...</code></li>
+<li>String compare-এ <code>==</code> না, <code>.equals()</code> ব্যবহার করো (CW Task 2, UG Task 1)।</li></ul></div>
+<div class="codewrap"><div class="code-title">Classwork Task 1 থেকে</div><pre class="java"><code>Triangle t2 = new Triangle(4, 5, 6);
+Triangle t3 = new Triangle(4, 5, 6);
+t2 == t3     // false: আলাদা address, sides same
+t1 = t2;
+t1 == t2     // true: same address</code></pre></div>
+</div>
+</div>
+
+<div class="concept" id="b-pass">
+<h3>3. Method-এ argument pass: primitive vs object</h3>
+<p>Java সবসময় <b>copy</b> পাঠায় (pass by value)। কিন্তু <b>কীসের copy</b> সেটাই আসল:</p>
+<table class="mini wide"><tr><th>যা পাঠাচ্ছো</th><th>কপি হয়</th><th>Method-এ বদলালে caller-এর দিকে?</th></tr>
+<tr><td><code>int, double</code> ইত্যাদি</td><td>value</td><td>❌ বদলায় না</td></tr>
+<tr><td>Object / Array</td><td>address (reference)</td><td>✅ <code>obj.field = …</code> বা <code>arr[0] = …</code> করলে <b>আসল object বদলায়</b></td></tr>
+<tr><td>Object / Array</td><td>address</td><td>❌ কিন্তু parameter-কেই নতুন object দিলে (<code>obj = new …</code>) caller-এর variable বদলায় না</td></tr></table>
+<div class="codewrap"><div class="code-title">Homework Task 5 থেকে (QuizA)</div><pre class="java"><code>public int methodB(int x1, QuizA x2) {
+    x2.sum = x1 + x2.x;   // x2 আর exam একই object → exam.sum বদলে গেল!
+    ...
+}
+this.y = this.sum + methodB(exam.sum, exam);   // exam-এর reference পাঠানো হলো</code></pre></div>
+</div>
+
+<div class="concept" id="b-this">
+<h3>4. কোন object-এর উপর method চলছে? (<code>this</code> বদলায়!)</h3>
+<p><code>t.methodB(2,3)</code> লিখলে methodB-এর ভেতরে <b>this = t</b>। একই class-এর ভেতর থেকেও অন্য object-এর method call করা যায়, তখন field গুলো ওই object-এর।</p>
+<div class="grid2">
+<div class="codewrap"><pre class="java"><code>public Trace(Trace t) {   // new Trace(t1)
+    sum = t.sum++;   // this.sum (নতুন obj) = t1.sum; t1.sum++
+    x = t.x + 2;
+    t.methodB(2,3);  // methodB চলে t1-এর উপর!
+}</code></pre></div>
+<div><ul>
+<li>শুধু <code>x</code> লিখলে = <code>this.x</code> = যে object-এর উপর method চলছে তার x।</li>
+<li><code>t.x</code> = parameter t যে object কে point করে তার x।</li>
+<li><code>a2.methodC(this)</code>: methodC-এর ভেতরে this = a2, আর parameter a = আগের this (a1)। <b>উল্টে যায়!</b> (HW Task 6)</li></ul></div>
+</div>
+</div>
+
+<div class="concept" id="b-multi">
+<h3>5. Multi-class problem: এক class-এর ভেতরে আরেক class-এর object</h3>
+<p>বাস্তবে একটা জিনিস আরেকটা জিনিসকে "ধরে রাখে" (<b>has-a</b> relationship): Teacher-এর কাছে Course আছে, Team-এ Player আছে, Connect-এর কাছে Student আছে। এজন্য একটা class-এ অন্য class-এর <b>object-এর array</b> রাখা হয়।</p>
+<div class="grid2">
+<div class="codewrap"><div class="code-title">Classwork Task 3</div><pre class="java"><code>public class Course {
+    public String name;
+    public Course(String name) { this.name = name; }
+}
+
+public class Teacher {
+    public Course[] courses = new Course[3];  // object array
+    public int count = 0;
+
+    public void addCourse(Course c) {         // object pass
+        courses[count] = c;   // reference রেখে দিলাম
+        count++;
+    }
+    public void printDetail() {
+        for (int i = 0; i < count; i++)
+            System.out.println(courses[i].name);  // dot দিয়ে field
+    }
+}</code></pre></div>
+<div><ul>
+<li><code>new Course[3]</code> শুধু ৩টা <b>খালি জায়গা</b> বানায়, সবগুলো <code>null</code>। Object আলাদা করে <code>new Course(...)</code> দিয়ে বানাতে হয়।</li>
+<li>Array-তে object রাখলে আসলে <b>reference</b> রাখা হয়। পরে মূল object বদলালে array থেকেও বদলানো value দেখা যায় (HW Task 3: <code>updateCost</code>-এর পর itinerary-তে 610)।</li>
+<li>Loop চালাও <code>count</code> পর্যন্ত, length পর্যন্ত না। নাহলে <code>null.name</code> → <b>NullPointerException</b>!</li>
+<li>প্রতিটা class আলাদা <code>.java</code> file-এ রাখো (Course.java, Teacher.java)।</li></ul></div>
+</div>
+</div>
+
+<div class="concept">
+<h3>6. একই class-এর object parameter হিসেবে</h3>
+<p>একটা class-এর method নিজের class-এরই আরেকটা object নিতে পারে: <code>compareTriangles(Triangle other)</code>, <code>defeatVillain(Player other)</code>, <code>addItem(Shop other, String item)</code>। ভেতরে <code>this</code> = যে call করেছে, <code>other</code> = যাকে পাঠানো হয়েছে।</p>
+<div class="codewrap"><pre class="java"><code>ben.defeatVillain(kevin);     // this = ben, other = kevin
+s2.addItem(s1, "KitKat");     // this = s2, other = s1 → s1 থেকে খুঁজে s2-তে add</code></pre></div>
+</div>
+
+<div class="concept" id="b-tips">
+<h3>7. Tracing cheat-sheet (Lab 4)</h3>
+<div class="tips">
+<div class="tipc"><h4>📦 Heap-এ box আঁকো</h4><p>প্রতিটা <code>new</code>-এর জন্য আলাদা box (object) আঁকো, নাম দাও (t1, t2, exam…)। Variable থেকে box-এ <b>তীর</b> দাও। দুইটা variable একই box-এ তীর দিলে একটা বদলালে দুইটাই বদলায়।</p></div>
+<div class="tipc"><h4>🎯 this কে?</h4><p><code>obj.method()</code> চললে method-এর ভেতরে this = obj। Field নাম একা লিখলে (<code>sum</code>) সেটা this-এর field, যদি একই নামে local/parameter না থাকে।</p></div>
+<div class="tipc"><h4>🔁 Reference parameter</h4><p><code>x2.sum = …</code> → x2 যে object-এ তীর দেয় সেটাই বদলায়, caller-এর variable (exam) দিয়েও সেটা দেখা যাবে।</p></div>
+<div class="tipc"><h4>➡️ বাম থেকে ডানে</h4><p><code>this.y = this.sum + methodB(…)</code>: this.sum call-এর <b>আগে</b> পড়া হয়। methodB sum বদলালেও পুরনো value ব্যবহার হয়। <code>… + methodC(…) + x</code>: x পড়া হয় call-এর <b>পরে</b>!</p></div>
+<div class="tipc"><h4>🔢 x++ / ++x</h4><p><code>sum = t.sum++</code> → পুরনো value assign, পরে t.sum বাড়ে। <code>(sum++)</code> print-এর ভেতরে থাকলে পুরনো value print হয়, পরে বাড়ে।</p></div>
+<div class="tipc"><h4>🧵 int + int + String</h4><p><code>t1.y + t1.x + " "</code> → প্রথম দুইটা int, তাই আগে <b>যোগ</b> (12+6 = 18)। String আসার পরে concatenation।</p></div>
+<div class="tipc"><h4>🏗 Constructor-এর ভেতরে call</h4><p><code>new Trace(t1)</code>-এর ভেতরে <code>t.methodB()</code> চললে সেটা t1-কে বদলায় আর print-ও করে, object তৈরির সময়েই।</p></div>
+<div class="tipc"><h4>🗂 প্রতিটা object-এর নিজের field</h4><p>নতুন object (<code>new TestX()</code>) বানালে তার field আবার initial value থেকে শুরু: i = 0, result = 17, নিজের নতুন array। অন্য object-এর বদলানো value আসে না।</p></div>
+</div>
+<p class="tip">📝 <b>Exam-এ trace করার নিয়ম:</b> (1) প্রতিটা object-এর জন্য box, field লেখো। (2) প্রতিটা method call-এ আলাদা frame, উপরে লেখো <b>this = কে</b>। (3) Object parameter-এর জন্য লেখো "x2 → exam"। (4) প্রতি line-এ কোন box-এর কোন field বদলালো কেটে নতুন value লেখো। (5) Print হলে output table-এ এক row।</p>
+</div>
+</section>
+<section id="classwork"><h2><span class="num">02</span> Classwork</h2>
+<article class="task" id="cw1">
+<h3>Task 1 — Triangle (object compare, ==)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Triangle</b> class design করো। দুইটা triangle-এর sides তখনই "same" ধরা হবে যখন একই order-এ সব side সমান।</p><ul>
+<li><b>Equilateral:</b> তিনটা side-ই সমান।</li><li><b>Isosceles:</b> যেকোনো দুইটা side সমান।</li><li><b>Scalene:</b> সব side আলাদা।</li></ul>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">TriangleTester.java</div><pre class="java"><code>public class TriangleTester{
+ public static void main(String args[]){
+   Triangle t1 = new Triangle(4, 4, 4);
+   Triangle t2 = new Triangle(4, 5, 6);
+   Triangle t3 = new Triangle(4, 5, 6);
+   Triangle t4 = new Triangle(5, 4, 6);
+
+     t1.triangleDetails();
+     System.out.println(&quot;--------1--------&quot;);
+     System.out.println(t1.printTriangleType());
+     System.out.println(&quot;--------2--------&quot;);
+     t3.triangleDetails();
+     System.out.println(t3.printTriangleType());
+     System.out.println(&quot;--------3--------&quot;);
+     t4.triangleDetails();
+     System.out.println(t4.printTriangleType());
+     System.out.println(&quot;--------4--------&quot;);
+     t2.compareTriangles(t3);
+     System.out.println(&quot;--------5--------&quot;);
+     t1.compareTriangles(t2);
+     System.out.println(&quot;--------6--------&quot;);
+     t1 = t2;
+     t1.compareTriangles(t2);
+     System.out.println(&quot;--------7--------&quot;);
+     t3.compareTriangles(t4);
+ }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li><code>compareTriangles(Triangle other)</code>: parameter হিসেবে আরেকটা Triangle object-এর <b>reference</b> আসে।</li>
+<li>Check-এর <b>order</b> গুরুত্বপূর্ণ: ① <code>this == other</code> (same address) → ② তিনটা side একই order-এ সমান → ③ শুধু perimeter সমান → ④ সব আলাদা।</li>
+<li><code>t1 = t2;</code> এর পর t1 আর t2 একই object, তাই section 6-এ "same address"।</li>
+<li>t3 (4,5,6) আর t4 (5,4,6): side গুলো একই সংখ্যা কিন্তু <b>order আলাদা</b>, তাই শুধু perimeter equal।</li>
+<li><code>printTriangleType()</code> String <b>return</b> করে, কারণ driver নিজে println করে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Triangle.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Triangle {
+    public int a, b, c;
+
+    public Triangle(int a, int b, int c) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
+    public int perimeter() {
+        return a + b + c;
+    }
+
+    public void triangleDetails() {
+        System.out.println(&quot;Three sides of the triangle are: &quot; + a + &quot;, &quot; + b + &quot;, &quot; + c);
+        System.out.println(&quot;Perimeter: &quot; + perimeter());
+    }
+
+    public String printTriangleType() {
+        if (a == b &amp;&amp; b == c) {
+            return &quot;This is an Equilateral Triangle.&quot;;
+        } else if (a == b || b == c || a == c) {
+            return &quot;This is an Isosceles Triangle.&quot;;
+        } else {
+            return &quot;This is a Scalene Triangle.&quot;;
+        }
+    }
+
+    // অন্য একটা Triangle object এর reference parameter হিসেবে আসে
+    public void compareTriangles(Triangle other) {
+        if (this == other) {                       // একই address (same object)
+            System.out.println(&quot;These two triangle objects have the same address.&quot;);
+        } else if (a == other.a &amp;&amp; b == other.b &amp;&amp; c == other.c) {
+            System.out.println(&quot;Addresses are different but the sides of the triangles are equal.&quot;);
+        } else if (perimeter() == other.perimeter()) {
+            System.out.println(&quot;Only the perimeter of both triangles is equal.&quot;);
+        } else {
+            System.out.println(&quot;Addresses, length of the sides and perimeter all are different.&quot;);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Three sides of the triangle are: 4, 4, 4
+Perimeter: 12
+--------1--------
+This is an Equilateral Triangle.
+--------2--------
+Three sides of the triangle are: 4, 5, 6
+Perimeter: 15
+This is a Scalene Triangle.
+--------3--------
+Three sides of the triangle are: 5, 4, 6
+Perimeter: 15
+This is a Scalene Triangle.
+--------4--------
+Addresses are different but the sides of the triangles are equal.
+--------5--------
+Addresses, length of the sides and perimeter all are different.
+--------6--------
+These two triangle objects have the same address.
+--------7--------
+Only the perimeter of both triangles is equal.</pre></details></div>
+</article><article class="task" id="cw2">
+<h3>Task 2 — Shop (object-কে parameter হিসেবে পাঠানো)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Shop</b> class design করো: নাম আর capacity দিয়ে (বা শুধু capacity দিয়ে) shop বানানো যাবে, item add/purchase করা যাবে, আর <b>অন্য shop থেকে item এনে</b> add করা যাবে।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">ShopTester.java</div><pre class="java"><code>public class ShopTester{
+  public static void main(String[] args){
+    Shop s1 = new Shop(&quot;Agora&quot;, 4);
+    Shop s2 = new Shop(3);
+    System.out.println(&quot;1==============&quot;);
+    s1.info();
+    System.out.println(&quot;2==============&quot;);
+    s2.info();
+    System.out.println(&quot;3==============&quot;);
+    s1.addItem(&quot;KitKat&quot;, 25);
+    s1.addItem(&quot;Hershey&#x27;s&quot;, 100);
+    s1.addItem(&quot;Dairy Milk&quot;, 150);
+    s1.addItem(&quot;Feastables&quot;, 500);
+    s1.addItem(&quot;Prime&quot;, 1200);
+    System.out.println(&quot;4==============&quot;);
+    s1.info();
+    System.out.println(&quot;5==============&quot;);
+    s1.purchase(&quot;KitKat&quot;);
+    s1.purchase(&quot;Snickers&quot;);
+    System.out.println(&quot;6==============&quot;);
+    s2.info();
+    System.out.println(&quot;7==============&quot;);
+    s2.addItem(s1, &quot;KitKat&quot;);
+    s2.addItem(&quot;Toblerone&quot;, 80);
+    s2.addItem(s1, &quot;Mars&quot;);
+    System.out.println(&quot;8==============&quot;);
+    s2.info();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>দুইটা constructor: <code>Shop(String, int)</code> আর <code>Shop(int)</code>। Output দেখে নাম না দিলে default <b>"Mega"</b>। <code>this("Mega", capacity)</code> দিয়ে chaining।</li>
+<li><code>addItem(Shop other, String item)</code>: <b>অন্য Shop object-এর reference</b> আসে। <code>other.items</code>, <code>other.prices</code> দিয়ে সেই shop-এর array-তে খুঁজি, পেলে নিজের <code>addItem(item, price)</code> call করি।</li>
+<li>Add সফল হলে কিছু print হয় না, শুধু ব্যর্থ হলে message (output খেয়াল করো)।</li>
+<li>⚠️ <code>purchase("KitKat")</code>-এর পরেও s2 Agora থেকে KitKat পায়। তাই purchase item <b>সরায় না</b>, শুধু আছে কিনা check করে।</li>
+<li>String compare-এ <code>.equals()</code>, <code>==</code> না।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Shop.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Shop {
+    public String name;
+    public int capacity;
+    public String[] items;
+    public int[] prices;
+    public int count = 0;
+
+    public Shop(String name, int capacity) {
+        this.name = name;
+        this.capacity = capacity;
+        items = new String[capacity];
+        prices = new int[capacity];
+        System.out.println(name + &quot; shop created!&quot;);
+    }
+
+    // নাম না দিলে default &quot;Mega&quot;
+    public Shop(int capacity) {
+        this(&quot;Mega&quot;, capacity);
+    }
+
+    public void addItem(String item, int price) {
+        if (count &lt; capacity) {
+            items[count] = item;
+            prices[count] = price;
+            count++;
+        } else {
+            System.out.println(item + &quot;, could not be added&quot;);
+        }
+    }
+
+    // অন্য Shop object থেকে item খুঁজে এনে নিজের shop-এ add
+    public void addItem(Shop other, String item) {
+        for (int i = 0; i &lt; other.count; i++) {
+            if (other.items[i].equals(item)) {
+                addItem(item, other.prices[i]);
+                return;
+            }
+        }
+        System.out.println(item + &quot;, not found in &quot; + other.name + &quot;!&quot;);
+    }
+
+    public void purchase(String item) {
+        for (int i = 0; i &lt; count; i++) {
+            if (items[i].equals(item)) {
+                System.out.println(&quot;Purchase Complete!&quot;);
+                return;
+            }
+        }
+        System.out.println(item + &quot;, is not available in this shop&quot;);
+    }
+
+    public void info() {
+        System.out.println(&quot;Shop Name: &quot; + name);
+        System.out.println(&quot;Item Details:&quot;);
+        if (count == 0) {
+            System.out.println(&quot;No items in shop&quot;);
+        } else {
+            System.out.println(count + &quot; / &quot; + capacity);
+            for (int i = 0; i &lt; count; i++) {
+                System.out.println(items[i] + &quot; - &quot; + prices[i] + &quot; Tk&quot;);
+            }
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Agora shop created!
+Mega shop created!
+1==============
+Shop Name: Agora
+Item Details:
+No items in shop
+2==============
+Shop Name: Mega
+Item Details:
+No items in shop
+3==============
+Prime, could not be added
+4==============
+Shop Name: Agora
+Item Details:
+4 / 4
+KitKat - 25 Tk
+Hershey&#x27;s - 100 Tk
+Dairy Milk - 150 Tk
+Feastables - 500 Tk
+5==============
+Purchase Complete!
+Snickers, is not available in this shop
+6==============
+Shop Name: Mega
+Item Details:
+No items in shop
+7==============
+Mars, not found in Agora!
+8==============
+Shop Name: Mega
+Item Details:
+2 / 3
+KitKat - 25 Tk
+Toblerone - 80 Tk</pre></details></div>
+</article><article class="task" id="cw3">
+<h3>Task 3 — Teacher & Course (multi-class)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Teacher</b> আর <b>Course</b> দুইটা class লেখো। একজন teacher সর্বোচ্চ <b>৩টা course</b> নিতে পারবেন।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">TestTeacher.java</div><pre class="java"><code>public class TestTeacher{
+  public static void main(String [] args){
+    Teacher t1 = new Teacher(&quot;Matin Saad Abdullah&quot;,&quot;MSA&quot;);
+    Teacher t2 = new Teacher(&quot;Mumit Khan&quot;,&quot;MMK&quot;);
+    Teacher t3 = new Teacher(&quot;Sadia Hamid Kazi&quot;,&quot;SKZ&quot;);
+    Course c1 = new Course(&quot;CSE 110&quot;);
+    Course c2 = new Course(&quot;CSE 111&quot;);
+    Course c3 = new Course(&quot;CSE 220&quot;);
+    Course c4 = new Course(&quot;CSE 221&quot;);
+    Course c5 = new Course(&quot;CSE 230&quot;);
+    Course c6 = new Course(&quot;CSE 310&quot;);
+    Course c7 = new Course(&quot;CSE 320&quot;);
+    Course c8 = new Course(&quot;CSE 340&quot;);
+    t1.addCourse(c1);
+    t1.addCourse(c2);
+    t2.addCourse(c3);
+    t2.addCourse(c4);
+    t2.addCourse(c5);
+    t3.addCourse(c6);
+    t3.addCourse(c7);
+    t3.addCourse(c8);
+    System.out.println(&quot;1========================&quot;);
+    t1.printDetail();
+    System.out.println(&quot;2========================&quot;);
+    t2.printDetail();
+    System.out.println(&quot;3========================&quot;);
+    t3.printDetail();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>এটাই classic <b>multi-class</b>: Teacher-এর ভেতরে <code>Course[] courses = new Course[3]</code>, মানে Course object-এর array।</li>
+<li><code>addCourse(Course c)</code>: Course object-এর reference array-তে রেখে দেয়।</li>
+<li><code>printDetail()</code>-এ <code>courses[i].name</code>: array থেকে object, তারপর dot দিয়ে তার field।</li>
+<li>Course class-টা খুব simple, শুধু একটা name। প্রতিটা class আলাদা file-এ রাখো।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Course.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Course {
+    public String name;
+
+    public Course(String name) {
+        this.name = name;
+    }
+}</code></pre></div><div class="codewrap"><div class="code-title">Teacher.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Teacher {
+    public String name;
+    public String initial;
+    public Course[] courses = new Course[3];   // Course object এর array
+    public int count = 0;
+
+    public Teacher(String name, String initial) {
+        this.name = name;
+        this.initial = initial;
+        System.out.println(&quot;A new teacher has been created&quot;);
+    }
+
+    public void addCourse(Course c) {
+        if (count &lt; 3) {
+            courses[count] = c;
+            count++;
+        } else {
+            System.out.println(&quot;A teacher can add maximum 3 courses&quot;);
+        }
+    }
+
+    public void printDetail() {
+        System.out.println(&quot;Name: &quot; + name);
+        System.out.println(&quot;Initial: &quot; + initial);
+        System.out.println(&quot;List of courses:&quot;);
+        for (int i = 0; i &lt; count; i++) {
+            System.out.println(courses[i].name);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">A new teacher has been created
+A new teacher has been created
+A new teacher has been created
+1========================
+Name: Matin Saad Abdullah
+Initial: MSA
+List of courses:
+CSE 110
+CSE 111
+2========================
+Name: Mumit Khan
+Initial: MMK
+List of courses:
+CSE 220
+CSE 221
+CSE 230
+3========================
+Name: Sadia Hamid Kazi
+Initial: SKZ
+List of courses:
+CSE 310
+CSE 320
+CSE 340</pre></details></div>
+</article><article class="task" id="cw4">
+<h3>Task 4 — Team & Player (multi-class + constructor overloading)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Team</b> আর <b>Player</b> class design করো। Hints:</p><ul>
+<li>Team class-এ Player object রাখার জন্য একটা array।</li><li>Team class-এ constructor overloading।</li><li>একটা team-এ সর্বোচ্চ <b>১১ জন</b> player।</li></ul>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">TeamTester.java</div><pre class="java"><code>public class TeamTester {
+  public static void main(String[] args) {
+    Team b = new Team();
+    b.updateName(&quot;Bangladesh&quot;);
+    Player mashrafi = new Player(&quot;Mashrafi&quot;, 42, 100);
+    b.addPlayer(mashrafi);
+    Player tamim = new Player(&quot;Tamim&quot;, 35, 70);
+    b.addPlayer(tamim);
+    System.out.println(&quot;==============&quot;);
+    b.printDetail();
+    System.out.println(&quot;==============&quot;);
+    Team a = new Team(&quot;Australia&quot;);
+    Player ponting = new Player(&quot;Ponting&quot;, 50, 300);
+    a.addPlayer(ponting);
+    Player lee = new Player(&quot;Lee&quot;, 49, 200);
+    a.addPlayer(lee);
+    a.printDetail();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li><code>Team()</code> আর <code>Team(String name)</code>: দুইটা constructor (overloading)। প্রথমটায় নাম পরে <code>updateName()</code> দিয়ে বসে।</li>
+<li><code>Player[] players = new Player[11]</code> + <code>count</code>।</li>
+<li><code>addPlayer(Player p)</code>: main-এ বানানো Player object-এর reference team-এর array-তে যায়।</li>
+<li>Print: <code>players[i].name</code>, <code>players[i].age</code>, <code>players[i].matches</code>।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Player.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Player {
+    public String name;
+    public int age;
+    public int matches;
+
+    public Player(String name, int age, int matches) {
+        this.name = name;
+        this.age = age;
+        this.matches = matches;
+    }
+}</code></pre></div><div class="codewrap"><div class="code-title">Team.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Team {
+    public String name;
+    public Player[] players = new Player[11];
+    public int count = 0;
+
+    public Team() {
+    }
+
+    public Team(String name) {
+        this.name = name;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void addPlayer(Player p) {
+        if (count &lt; 11) {
+            players[count] = p;
+            count++;
+        } else {
+            System.out.println(&quot;A team can have maximum 11 players&quot;);
+        }
+    }
+
+    public void printDetail() {
+        System.out.println(&quot;Team: &quot; + name);
+        System.out.println(&quot;List of players:&quot;);
+        for (int i = 0; i &lt; count; i++) {
+            System.out.println(&quot;Name: &quot; + players[i].name);
+            System.out.println(&quot;Age: &quot; + players[i].age + &quot;, Total Matches: &quot; + players[i].matches);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">==============
+Team: Bangladesh
+List of players:
+Name: Mashrafi
+Age: 42, Total Matches: 100
+Name: Tamim
+Age: 35, Total Matches: 70
+==============
+Team: Australia
+List of players:
+Name: Ponting
+Age: 50, Total Matches: 300
+Name: Lee
+Age: 49, Total Matches: 200</pre></details></div>
+</article><article class="task" id="cw5">
+<h3>Task 5 — Tracing (class Trace)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class Trace আর driver Tester5 দেওয়া আছে। Output কী হবে trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li><code>new Trace(t1)</code>: <b>object reference</b> pass করা constructor। t আর t1 একই object।</li>
+<li><code>sum = t.sum++</code>: নতুন object পায় পুরনো value, আর t1.sum বাড়ে।</li>
+<li><code>t.methodB(2,3)</code> constructor-এর ভেতর থেকে <b>t1-এর উপর</b> চলে, তাই t2 বানানোর সময়েই t1 বদলে যায় আর ২ line print হয়।</li>
+<li><code>(temp++)</code>: পুরনো temp ব্যবহার, পরে বাড়ে।</li>
+<li>methodB-এর local <code>y</code> আর methodA-এর local <code>x</code>: field-কে shadow করে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="cw5"></div></div>
+</article></section>
+<section id="homework"><h2><span class="num">03</span> Homework</h2>
+<p class="lead">Coding Task 1–4 Google Form-এ submit, Tracing Task 5–6 হাতে লিখে lab-এর শুরুতে জমা।</p>
+<article class="task" id="hw1">
+<h3>Task 1 — Player (villain হারানো)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Player</b> class design করো। একজন player সর্বোচ্চ <b>৫টা villain</b> হারাতে পারবে।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">PlayerTester.java</div><pre class="java"><code>public class PlayerTester {
+  public static void main(String[] args) {
+    Player ben = new Player(&quot;Ben&quot;, 10);
+    System.out.println(&quot;======1======&quot;);
+    ben.viewInfo();
+    System.out.println(&quot;======2======&quot;);
+    ben.defeatVillain(&quot;Vilgax&quot;, 100);
+    System.out.println(&quot;======3======&quot;);
+    ben.defeatVillain(&quot;Yamcha&quot;, 10);
+    System.out.println(&quot;======4======&quot;);
+    ben.viewInfo();
+    System.out.println(&quot;======5======&quot;);
+    ben.defeatVillain(&#x27;8&#x27;, &quot;Vilgax&quot;, 100);
+    System.out.println(&quot;======6======&quot;);
+    ben.viewInfo();
+    System.out.println(&quot;======7======&quot;);
+    Player kevin = new Player(&quot;Kevin&quot;);
+    System.out.println(&quot;======8======&quot;);
+    kevin.viewInfo();
+    System.out.println(&quot;======9======&quot;);
+    ben.defeatVillain(kevin);
+    System.out.println(&quot;======10======&quot;);
+    ben.viewInfo();
+    System.out.println(&quot;======11======&quot;);
+    Player goku = new Player(&quot;Goku&quot;, 9000);
+    System.out.println(&quot;======12======&quot;);
+    ben.defeatVillain(goku);
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>Constructor: <code>Player(String, int)</code> আর <code>Player(String)</code> (HP default <b>100</b>, Kevin দেখো)।</li>
+<li><code>defeatVillain(String, int)</code>: <code>hp &gt;= villainHp</code> হলে জিতবে (Ben 10 vs Yamcha 10 → জেতে), তখন villain-এর HP নিজের HP-তে যোগ হয় (10 → 20)।</li>
+<li><code>defeatVillain(char, String, int)</code>: <code>'8'</code> একটা char। <code>boost - '0'</code> করলে সংখ্যা 8 পাওয়া যায়। HP = 20 × 8 = 160, তারপর সাধারণ defeatVillain → 160 + 100 = 260।</li>
+<li><code>defeatVillain(Player other)</code>: <b>আরেকটা Player object</b> পাঠানো হয়। তার <code>other.name</code> আর <code>other.hp</code> নিয়ে প্রথম version call করি।</li>
+<li>Defeated list: প্রতিটা নামের পরে comma: <code>Yamcha, Vilgax, Kevin,</code></li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Player.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Player {
+    public String name;
+    public int hp;
+    public String[] defeated = new String[5];
+    public int count = 0;
+
+    public Player(String name, int hp) {
+        this.name = name;
+        this.hp = hp;
+        System.out.println(name + &quot; joined the game&quot;);
+        System.out.println(&quot;HP: &quot; + hp);
+    }
+
+    // HP না দিলে default 100
+    public Player(String name) {
+        this(name, 100);
+    }
+
+    public void defeatVillain(String villain, int villainHp) {
+        if (hp &gt;= villainHp &amp;&amp; count &lt; 5) {
+            defeated[count] = villain;
+            count++;
+            hp += villainHp;
+            System.out.println(&quot;defeated &quot; + villain);
+        } else {
+            System.out.println(&quot;failed to defeat &quot; + villain);
+        }
+    }
+
+    // char boost: &#x27;8&#x27; -&gt; 8 গুণ HP
+    public void defeatVillain(char boost, String villain, int villainHp) {
+        hp = hp * (boost - &#x27;0&#x27;);
+        System.out.println(&quot;HP with &quot; + boost + &quot;x boost: &quot; + hp);
+        defeatVillain(villain, villainHp);
+    }
+
+    // অন্য Player object কে villain হিসেবে হারানো
+    public void defeatVillain(Player other) {
+        defeatVillain(other.name, other.hp);
+    }
+
+    public void viewInfo() {
+        System.out.println(&quot;Player Name: &quot; + name);
+        System.out.println(&quot;Current HP: &quot; + hp);
+        if (count &gt; 0) {
+            System.out.println(&quot;Defeated:&quot;);
+            String list = &quot;&quot;;
+            for (int i = 0; i &lt; count; i++) {
+                list += defeated[i] + &quot;,&quot;;
+                if (i &lt; count - 1) list += &quot; &quot;;
+            }
+            System.out.println(list);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Ben joined the game
+HP: 10
+======1======
+Player Name: Ben
+Current HP: 10
+======2======
+failed to defeat Vilgax
+======3======
+defeated Yamcha
+======4======
+Player Name: Ben
+Current HP: 20
+Defeated:
+Yamcha,
+======5======
+HP with 8x boost: 160
+defeated Vilgax
+======6======
+Player Name: Ben
+Current HP: 260
+Defeated:
+Yamcha, Vilgax,
+======7======
+Kevin joined the game
+HP: 100
+======8======
+Player Name: Kevin
+Current HP: 100
+======9======
+defeated Kevin
+======10======
+Player Name: Ben
+Current HP: 360
+Defeated:
+Yamcha, Vilgax, Kevin,
+======11======
+Goku joined the game
+HP: 9000
+======12======
+failed to defeat Goku</pre></details></div>
+</article><article class="task" id="hw2">
+<h3>Task 2 — Student (CGPA rule)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Student</b> class লেখো। Rules:</p><ul>
+<li>CGPA set না হওয়া পর্যন্ত কোনো course নেওয়া যাবে না।</li><li>সর্বোচ্চ <b>৪টা</b> course।</li><li>CGPA 3-এর নিচে হলে সর্বোচ্চ <b>৩টা</b> course।</li></ul>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">StudentDriver.java</div><pre class="java"><code>public class StudentDriver {
+  public static void main(String[] args){
+    Student student1 = new Student(12345678);
+    System.out.println(&quot;1-----------------&quot;);
+    student1.addCourse(&quot;CSE110&quot;);
+    System.out.println(&quot;2-----------------&quot;);
+    student1.storeCG(2.5);
+    student1.addCourse(&quot;CSE110&quot;);
+    student1.addCourse(&quot;ENG101&quot;);
+    student1.showAdvisee();
+    System.out.println(&quot;3-----------------&quot;);
+    student1.removeAllCourse();
+    student1.showAdvisee();
+    System.out.println(&quot;4-----------------&quot;);
+    student1.storeID(54652365);
+    student1.addCourse(new String [] {&quot;SOC101&quot;,&quot;CSE111&quot;,&quot;ENG102&quot;});
+    student1.showAdvisee();
+    System.out.println(&quot;5-----------------&quot;);
+    student1.addCourse(&quot;CSE230&quot;);
+    student1.showAdvisee();
+    System.out.println(&quot;6-----------------&quot;);
+    Student student2 = new Student(975738383,3.7);
+    System.out.println(&quot;7-----------------&quot;);
+    String[] courses2 = {&quot;CSE220&quot;,&quot;PHY112&quot;,&quot;MAT120&quot;,&quot;BUS101&quot;,&quot;CHN101&quot;};
+    student2.addCourse(courses2);
+    student2.showAdvisee();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>দুইটা constructor: <code>Student(int id)</code> আর <code>Student(int id, double cgpa)</code>।</li>
+<li><code>cgpa</code>-এর default <b>0.0</b> দিয়ে বুঝি "এখনো set হয়নি"।</li>
+<li><code>addCourse(String)</code>-এ check-এর order: CG set কিনা → ৪টা হয়ে গেছে কিনা → CG &lt; 3 আর ৩টা হয়ে গেছে কিনা → তারপর add।</li>
+<li><code>addCourse(String[] list)</code>: পুরো <b>array-এর reference</b> আসে, loop চালিয়ে প্রতিটার জন্য প্রথম version call। <code>new String[]{...}</code> দিয়ে সরাসরি array বানিয়েও পাঠানো যায়।</li>
+<li><code>removeAllCourse()</code>: count = 0 আর নতুন খালি array।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Student.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Student {
+    public int id;
+    public double cgpa;              // 0.0 মানে এখনো set হয়নি
+    public String[] courses = new String[4];
+    public int count = 0;
+
+    public Student(int id) {
+        this.id = id;
+        System.out.println(&quot;A student with ID &quot; + id + &quot; has been created.&quot;);
+    }
+
+    public Student(int id, double cgpa) {
+        this.id = id;
+        this.cgpa = cgpa;
+        System.out.println(&quot;A student with ID &quot; + id + &quot; and cgpa &quot; + cgpa + &quot; has been created.&quot;);
+    }
+
+    public void storeCG(double cgpa) {
+        this.cgpa = cgpa;
+    }
+
+    public void storeID(int id) {
+        this.id = id;
+    }
+
+    public void addCourse(String course) {
+        if (cgpa == 0.0) {
+            System.out.println(&quot;Failed to add &quot; + course);
+            System.out.println(&quot;Set CG first&quot;);
+        } else if (count &gt;= 4) {
+            System.out.println(&quot;Failed to add &quot; + course);
+            System.out.println(&quot;Maximum 4 courses allowed.&quot;);
+        } else if (cgpa &lt; 3 &amp;&amp; count &gt;= 3) {
+            System.out.println(&quot;Failed to add &quot; + course);
+            System.out.println(&quot;CG is low. Can&#x27;t add more than 3 courses.&quot;);
+        } else {
+            courses[count] = course;
+            count++;
+        }
+    }
+
+    // array of courses (array reference pass)
+    public void addCourse(String[] list) {
+        for (int i = 0; i &lt; list.length; i++) {
+            addCourse(list[i]);
+        }
+    }
+
+    public void removeAllCourse() {
+        courses = new String[4];
+        count = 0;
+    }
+
+    public void showAdvisee() {
+        System.out.println(&quot;Student ID: &quot; + id + &quot;, CGPA: &quot; + cgpa);
+        if (count == 0) {
+            System.out.println(&quot;No courses added.&quot;);
+        } else {
+            System.out.println(&quot;Added courses are:&quot;);
+            String list = courses[0];
+            for (int i = 1; i &lt; count; i++) list += &quot; &quot; + courses[i];
+            System.out.println(list);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">A student with ID 12345678 has been created.
+1-----------------
+Failed to add CSE110
+Set CG first
+2-----------------
+Student ID: 12345678, CGPA: 2.5
+Added courses are:
+CSE110 ENG101
+3-----------------
+Student ID: 12345678, CGPA: 2.5
+No courses added.
+4-----------------
+Student ID: 54652365, CGPA: 2.5
+Added courses are:
+SOC101 CSE111 ENG102
+5-----------------
+Failed to add CSE230
+CG is low. Can&#x27;t add more than 3 courses.
+Student ID: 54652365, CGPA: 2.5
+Added courses are:
+SOC101 CSE111 ENG102
+6-----------------
+A student with ID 975738383 and cgpa 3.7 has been created.
+7-----------------
+Failed to add CHN101
+Maximum 4 courses allowed.
+Student ID: 975738383, CGPA: 3.7
+Added courses are:
+CSE220 PHY112 MAT120 BUS101</pre></details></div>
+</article><article class="task" id="hw3">
+<h3>Task 3 — TravelPrep (একই class-এ package আর destination)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>TravelPrep</b> class design করো:</p><ul>
+<li>Class-টা package-এর info আর তার ভেতরের destination গুলো track করে।</li><li>যেকোনো traveller-এর initial budget <b>1250 yen</b>।</li>
+<li>একজন traveller সর্বোচ্চ <b>৩টা</b> destination যেতে পারবে, যদি budget-এর মধ্যে থাকে।</li></ul>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">TravelPlan.java</div><pre class="java"><code>public class TravelPlan {
+  public static void main(String[] args) {
+    TravelPrep t1 = new TravelPrep();
+    System.out.println(&quot;1==================&quot;);
+    TravelPrep t2 = new TravelPrep(&quot;Package-2&quot;, 2100);
+    System.out.println(&quot;2==================&quot;);
+    TravelPrep d1 = new TravelPrep(&quot;Fushimi&quot;, &quot;Shrine&quot;);
+    TravelPrep d2 = new TravelPrep(&quot;Lake&quot;, &quot;Kawaguchi&quot;, 550);
+    TravelPrep d3 = new TravelPrep(&quot;Shrine&quot;, &quot;Hieizan&quot;, 1000);
+    TravelPrep d4 = new TravelPrep(&quot;Lake&quot;, &quot;Ashi&quot;, 620);
+    System.out.println(&quot;3==================&quot;);
+    t2.add_to_itinerary(d1);
+    t2.add_to_itinerary(d2, d3);
+    t2.show_itinerary();
+    System.out.println(&quot;4==================&quot;);
+    System.out.println(d2.updateCost(60));
+    System.out.println(&quot;5==================&quot;);
+    t1.t_name = &quot;Package-1&quot;;
+    t1.add_to_itinerary(d2, d4);
+    t1.add_to_itinerary(d3);
+    System.out.println(&quot;6==================&quot;);
+    t1.show_itinerary();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>মজার ব্যাপার: <b>একই class</b> দুই রকম কাজে ব্যবহার হচ্ছে: package (t1, t2) আর destination (d1–d4)। তাই দুই সেট field রাখি।</li>
+<li><b>৪টা constructor:</b> <code>()</code>, <code>(String, int)</code> package-এর জন্য; <code>(String name, String type)</code> (default cost 300) আর <code>(String type, String name, int cost)</code> destination-এর জন্য। ⚠️ দ্বিতীয়টায় <b>order উল্টো</b>: ("Lake", "Kawaguchi", 550) → type = Lake।</li>
+<li><code>itinerary</code> হলো <code>TravelPrep[]</code>, destination object-এর <b>reference</b> রাখে। তাই <code>d2.updateCost(60)</code>-এর পরে t1-এর itinerary-তে d2-এর cost 610 দেখায়।</li>
+<li>Budget check: এখনকার total + নতুন cost &gt; budget হলে "Budget going overboard"। t1: 610 + 620 = 1230, তারপর +1000 → overboard।</li>
+<li><code>t_name</code> public, কারণ driver সরাসরি <code>t1.t_name = "Package-1"</code> করে।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">TravelPrep.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class TravelPrep {
+    // ---- package (traveller) এর তথ্য ----
+    public String t_name = &quot;Unknown package&quot;;
+    public int budget = 1250;
+    public TravelPrep[] itinerary = new TravelPrep[3];
+    public int count = 0;
+
+    // ---- destination এর তথ্য ----
+    public String d_name, d_type;
+    public int cost;
+
+    // 1) Package: default
+    public TravelPrep() {
+        System.out.println(t_name + &quot; would cost at most &quot; + budget + &quot; yen&quot;);
+    }
+
+    // 2) Package: name + budget
+    public TravelPrep(String t_name, int budget) {
+        this.t_name = t_name;
+        this.budget = budget;
+        System.out.println(t_name + &quot; would cost at most &quot; + budget + &quot; yen&quot;);
+    }
+
+    // 3) Destination: (name, type), default cost 300
+    public TravelPrep(String d_name, String d_type) {
+        this.d_name = d_name;
+        this.d_type = d_type;
+        this.cost = 300;
+        System.out.println(d_name + &quot; &quot; + d_type + &quot; costs &quot; + cost + &quot; yen&quot;);
+    }
+
+    // 4) Destination: (type, name, cost)  &lt;- order খেয়াল করো
+    public TravelPrep(String d_type, String d_name, int cost) {
+        this.d_name = d_name;
+        this.d_type = d_type;
+        this.cost = cost;
+        System.out.println(d_name + &quot; &quot; + d_type + &quot; costs &quot; + cost + &quot; yen&quot;);
+    }
+
+    public int totalCost() {
+        int total = 0;
+        for (int i = 0; i &lt; count; i++) total += itinerary[i].cost;
+        return total;
+    }
+
+    public void add_to_itinerary(TravelPrep d) {
+        if (count &gt;= 3) {
+            System.out.println(&quot;Maximum 3 destinations allowed&quot;);
+        } else if (totalCost() + d.cost &gt; budget) {
+            System.out.println(&quot;Budget going overboard&quot;);
+        } else {
+            itinerary[count] = d;     // object এর reference store
+            count++;
+        }
+    }
+
+    public void add_to_itinerary(TravelPrep d1, TravelPrep d2) {
+        add_to_itinerary(d1);
+        add_to_itinerary(d2);
+    }
+
+    public String updateCost(int extra) {
+        cost += extra;
+        return &quot;Cost of &quot; + d_name + &quot; &quot; + d_type + &quot; updated to &quot; + cost;
+    }
+
+    public void show_itinerary() {
+        System.out.println(&quot;Itinerary for &quot; + t_name);
+        for (int i = 0; i &lt; count; i++) {
+            TravelPrep d = itinerary[i];
+            System.out.println((i + 1) + &quot;. &quot; + d.d_name + &quot; &quot; + d.d_type + &quot; - &quot; + d.cost + &quot; yen&quot;);
+        }
+        System.out.println(&quot;Total cost of &quot; + count + &quot; destinations: &quot; + totalCost() + &quot; yen&quot;);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Unknown package would cost at most 1250 yen
+1==================
+Package-2 would cost at most 2100 yen
+2==================
+Fushimi Shrine costs 300 yen
+Kawaguchi Lake costs 550 yen
+Hieizan Shrine costs 1000 yen
+Ashi Lake costs 620 yen
+3==================
+Itinerary for Package-2
+1. Fushimi Shrine - 300 yen
+2. Kawaguchi Lake - 550 yen
+3. Hieizan Shrine - 1000 yen
+Total cost of 3 destinations: 1850 yen
+4==================
+Cost of Kawaguchi Lake updated to 610
+5==================
+Budget going overboard
+6==================
+Itinerary for Package-1
+1. Kawaguchi Lake - 610 yen
+2. Ashi Lake - 620 yen
+Total cost of 2 destinations: 1230 yen</pre></details></div>
+</article><article class="task" id="hw4">
+<h3>Task 4 — Student & Connect (multi-class + object state)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p><b>Student</b> আর <b>Connect</b> class design করো। Notes:</p><ul>
+<li>Student তৈরির সময় email, password আর login status <b>null</b>।</li><li>শুধু output-এ যা condition আছে সেগুলো মানলেই চলবে।</li>
+<li>Connect-এ দুইটা instance variable: <code>totalAdvisee</code> আর Student-এর array। Advising <b>সফল হলেই</b> শুধু array update।</li><li>Connect সর্বোচ্চ <b>৫ জন</b> advisee নিতে পারে।</li></ul>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">ConnectTester.java</div><pre class="java"><code>public class ConnectTester {
+  public static void main(String[] args) {
+    Student rakib = new Student(&quot;Rakib&quot;, 12301455, &quot;CSE&quot;);
+    Student roy = new Student(&quot;Roy&quot;, 12501345, &quot;CS&quot;);
+
+    System.out.println(&quot;1*************&quot;);
+    Connect connectObj = new Connect();
+    System.out.println(&quot;2*************&quot;);
+    connectObj.login(rakib);
+    System.out.println(&quot;3*************&quot;);
+    connectObj.advising(rakib);
+    System.out.println(&quot;4*************&quot;);
+    rakib.email = &quot;rakib@hotmail.com&quot;;
+    rakib.password = &quot;1234&quot;;
+
+    System.out.println(&quot;5*************&quot;);
+    connectObj.login(rakib);
+    System.out.println(&quot;6*************&quot;);
+    connectObj.advising(rakib);
+    System.out.println(&quot;7*************&quot;);
+    connectObj.advising(rakib, &quot;CSE110&quot;, &quot;PHY111&quot;, &quot;MAT110&quot;, &quot;CSE260&quot;);
+    System.out.println(&quot;8*************&quot;);
+    connectObj.advising(rakib, &quot;CSE110&quot;, &quot;PHY111&quot;,&quot;MAT110&quot;);
+
+    System.out.println(&quot;9*************&quot;);
+    connectObj.allAdviseeInfo();
+    System.out.println(&quot;10*************&quot;);
+    roy.email = &quot;roy@hotmail.com&quot;;
+    roy.password = &quot;abcd&quot;;
+    connectObj.login(roy);
+    System.out.println(&quot;11*************&quot;);
+    connectObj.advising(roy, &quot;CSE110&quot;, &quot;ENG101&quot;, &quot;PHY112&quot;);
+    System.out.println(&quot;12*************&quot;);
+
+    connectObj.allAdviseeInfo();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul>
+<li>Student-এর <code>email, password, loginStatus</code> String, default <b>null</b>। Driver সরাসরি <code>rakib.email = ...</code> set করে, তাই public।</li>
+<li><code>login(Student s)</code>: email/password null হলে error; নাহলে <code>s.loginStatus</code> set। <b>Reference pass</b> হওয়ায় main-এর rakib object-টাই logged in হয়ে যায়।</li>
+<li><code>advising</code> ৩ ভাবে overload: শুধু student (0 course), student + ৩ course (সফল), student + ৪ course (special approval লাগবে)।</li>
+<li>সফল হলে course গুলো Student object-এর ভেতরেই রাখি, আর Student-এর reference Connect-এর array-তে।</li>
+<li><code>allAdviseeInfo()</code>: array-র প্রতিটা Student-এর field দেখায়, তারপর <code>==============</code>।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Student.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Student {
+    public String name;
+    public int id;
+    public String dept;
+    public String email;          // default null
+    public String password;       // default null
+    public String loginStatus;    // default null
+    public String[] courses = new String[3];
+    public int courseCount = 0;
+
+    public Student(String name, int id, String dept) {
+        this.name = name;
+        this.id = id;
+        this.dept = dept;
+        System.out.println(&quot;Student object is created&quot;);
+    }
+}</code></pre></div><div class="codewrap"><div class="code-title">Connect.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Connect {
+    public int totalAdvisee = 0;
+    public Student[] advisees = new Student[5];
+
+    public Connect() {
+        System.out.println(&quot;Connect is ready to use!&quot;);
+    }
+
+    public void login(Student s) {
+        if (s.email == null || s.password == null) {
+            System.out.println(&quot;Email and password need to be set.&quot;);
+        } else {
+            s.loginStatus = &quot;logged in&quot;;     // Student object টাই বদলে গেল
+            System.out.println(&quot;Login successful&quot;);
+        }
+    }
+
+    public void advising(Student s) {
+        if (s.loginStatus == null) {
+            System.out.println(&quot;Please login to advise courses!&quot;);
+        } else {
+            System.out.println(&quot;You haven&#x27;t selected any courses.&quot;);
+        }
+    }
+
+    public void advising(Student s, String c1, String c2, String c3) {
+        if (s.loginStatus == null) {
+            System.out.println(&quot;Please login to advise courses!&quot;);
+        } else if (totalAdvisee &gt;= 5) {
+            System.out.println(&quot;Connect can take at most 5 advisees.&quot;);
+        } else {
+            s.courses[0] = c1;
+            s.courses[1] = c2;
+            s.courses[2] = c3;
+            s.courseCount = 3;
+            advisees[totalAdvisee] = s;
+            totalAdvisee++;
+            System.out.println(&quot;Advising successful!&quot;);
+        }
+    }
+
+    public void advising(Student s, String c1, String c2, String c3, String c4) {
+        if (s.loginStatus == null) {
+            System.out.println(&quot;Please login to advise courses!&quot;);
+        } else {
+            System.out.println(&quot;You need special approval to take more than 3 courses.&quot;);
+        }
+    }
+
+    public void allAdviseeInfo() {
+        System.out.println(&quot;Total Advisee: &quot; + totalAdvisee);
+        for (int i = 0; i &lt; totalAdvisee; i++) {
+            Student s = advisees[i];
+            System.out.println(&quot;Name: &quot; + s.name + &quot; ID: &quot; + s.id);
+            System.out.println(&quot;Department: &quot; + s.dept);
+            System.out.println(&quot;Advised Courses:&quot;);
+            String list = s.courses[0];
+            for (int j = 1; j &lt; s.courseCount; j++) list += &quot; &quot; + s.courses[j];
+            System.out.println(list);
+            System.out.println(&quot;==============&quot;);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Student object is created
+Student object is created
+1*************
+Connect is ready to use!
+2*************
+Email and password need to be set.
+3*************
+Please login to advise courses!
+4*************
+5*************
+Login successful
+6*************
+You haven&#x27;t selected any courses.
+7*************
+You need special approval to take more than 3 courses.
+8*************
+Advising successful!
+9*************
+Total Advisee: 1
+Name: Rakib ID: 12301455
+Department: CSE
+Advised Courses:
+CSE110 PHY111 MAT110
+==============
+10*************
+Login successful
+11*************
+Advising successful!
+12*************
+Total Advisee: 2
+Name: Rakib ID: 12301455
+Department: CSE
+Advised Courses:
+CSE110 PHY111 MAT110
+==============
+Name: Roy ID: 12501345
+Department: CS
+Advised Courses:
+CSE110 ENG101 PHY112
+==============</pre></details></div>
+</article><article class="task" id="hw5">
+<h3>Task 5 — Tracing (class QuizA)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class QuizA আর QuizTesterA দেওয়া আছে, output trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li>Constructor-এ <code>this.x = y; this.y = x;</code>: parameter <b>উল্টো</b> করে বসানো।</li>
+<li><code>methodB(exam.sum, exam)</code>: x2 = exam-এর reference। <code>x2.sum = …</code> মানে exam.sum বদলানো।</li>
+<li><code>this.y = this.sum + methodB(…)</code>: this.sum (1) call-এর <b>আগে</b> পড়া হয়।</li>
+<li>Line 18-এ exam.sum এখন 14, 3 না!</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="hw5"></div></div>
+</article><article class="task" id="hw6">
+<h3>Task 6 — Tracing (class A)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class A আর TesterA দেওয়া আছে, output trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li><code>new A()</code> constructor-এর ভেতরে methodB → প্রথম line print হয় object তৈরির সময়।</li>
+<li><code>(y++) + (++this.y)</code>, <code>++this.x</code>, <code>(sum++)</code>, <code>(this.x++)</code>: increment-এর ফাঁদ।</li>
+<li><code>(++temp) + methodC(temp, y) + x</code>: x পড়া হয় methodC-এর <b>পরে</b>, তখন x বেড়ে 5।</li>
+<li><code>methodC(A a)</code> vs <code>methodC(int, int)</code>: overloading।</li>
+<li><code>a2.methodC(this)</code>: methodC-এর ভেতরে this = a2, a = a1। উল্টে যায়!</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="hw6"></div></div>
+</article></section>
+<section id="ungraded"><h2><span class="num">04</span> Ungraded Tasks (Optional)</h2>
+<p class="lead">জমা দিতে হবে না, তবে practice-এর জন্য খুব ভালো।</p>
+<article class="task" id="ug1">
+<h3>Task 1 — Taxi (route compare)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>দুইটা Taxi-র route এক কিনা compare করো।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">TaxiTester.java</div><pre class="java"><code>public class TaxiTester{
+  public static void main(String args []){
+    Taxi t1 = new Taxi(&quot;MX8190&quot;, &quot;Gulshan&quot;);
+
+    Taxi t2 = new Taxi(&quot;MX6718&quot;, &quot;Badda&quot;);
+    Taxi t3 = new Taxi(&quot;MX2789&quot;, &quot;Gulshan&quot;);
+    System.out.println(&quot;1------------&quot;);
+    t1.compareTaxi(t2);
+    System.out.println(&quot;2------------&quot;);
+    t1.compareTaxi(t3);
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li><code>compareTaxi(Taxi other)</code>: অন্য Taxi object-এর reference নিয়ে <code>route.equals(other.route)</code>।</li><li>String-এর জন্য <code>.equals()</code> ব্যবহার করো।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Taxi.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Taxi {
+    public String number;
+    public String route;
+
+    public Taxi(String number, String route) {
+        this.number = number;
+        this.route = route;
+    }
+
+    public void compareTaxi(Taxi other) {
+        if (route.equals(other.route)) {
+            System.out.println(&quot;Both routes are the same!&quot;);
+        } else {
+            System.out.println(&quot;Routes are not the same!&quot;);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">1------------
+Routes are not the same!
+2------------
+Both routes are the same!</pre></details></div>
+</article><article class="task" id="ug2">
+<h3>Task 2 — ConnectFriends</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Friend request পাঠানো (limit সহ), request remove করা আর details দেখানো।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">ConnectTester.java</div><pre class="java"><code>public class ConnectTester{
+ public static void main(String[] args) {
+  ConnectFriends sanaf = new ConnectFriends(&quot;Sanaf&quot;);
+  System.out.println(&quot;=======1=======&quot;);
+  ConnectFriends mantasha = new ConnectFriends(&quot;Mantasha&quot;, 3);
+  ConnectFriends mostafiz = new ConnectFriends(&quot;Mostafiz&quot;);
+  ConnectFriends matt = new ConnectFriends(&quot;Matt&quot;, 4);
+  System.out.println(&quot;=======2=======&quot;);
+  sanaf.sendFriendRequest(mantasha);
+  System.out.println(&quot;=======3=======&quot;);
+  sanaf.sendFriendRequest(mostafiz, matt);
+  System.out.println(&quot;=======4=======&quot;);
+  sanaf.showDetails();
+  System.out.println(&quot;=======5=======&quot;);
+  sanaf.removeRequest(&quot;Mantasha&quot;);
+  System.out.println(&quot;=======6=======&quot;);
+  sanaf.showDetails();
+  System.out.println(&quot;=======7=======&quot;);
+  sanaf.removeRequest(&quot;Murdock&quot;);
+  System.out.println(&quot;=======8=======&quot;);
+  sanaf.removeRequest(&quot;Matt&quot;);
+  sanaf.removeRequest(&quot;Mostafiz&quot;);
+  sanaf.showDetails();
+  System.out.println(&quot;=======9=======&quot;);
+  mantasha.showDetails();
+ }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li>Constructor: <code>(String)</code> limit default <b>2</b>, আর <code>(String, int)</code>।</li>
+<li><code>ConnectFriends[] sent</code>: request পাঠানো মানুষগুলোর <b>object reference</b> রাখে। <code>sent[i].name</code> দিয়ে নাম।</li>
+<li><code>sendFriendRequest(f1, f2)</code> প্রথম version ২ বার call করে; limit পূর্ণ হলে message।</li>
+<li><code>removeRequest</code>: নাম খুঁজে পেলে বাকি গুলো বামে shift করি।</li>
+<li>⚠️ Output-এ "Reuqest" বানান PDF-এ এভাবেই আছে, হুবহু রেখেছি।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">ConnectFriends.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class ConnectFriends {
+    public String name;
+    public int limit;
+    public ConnectFriends[] sent;
+    public int count = 0;
+
+    public ConnectFriends(String name, int limit) {
+        this.name = name;
+        this.limit = limit;
+        sent = new ConnectFriends[limit];
+        System.out.println(&quot;Welcome to ConnectFriends, &quot; + name);
+    }
+
+    public ConnectFriends(String name) {
+        this(name, 2);
+    }
+
+    public void sendFriendRequest(ConnectFriends f) {
+        if (count &lt; limit) {
+            sent[count] = f;
+            count++;
+            System.out.println(name + &quot; sent a friend request to &quot; + f.name + &quot;.&quot;);
+        } else {
+            System.out.println(name + &quot; has reached the friend request limit!&quot;);
+        }
+    }
+
+    public void sendFriendRequest(ConnectFriends f1, ConnectFriends f2) {
+        sendFriendRequest(f1);
+        sendFriendRequest(f2);
+    }
+
+    public void removeRequest(String friend) {
+        for (int i = 0; i &lt; count; i++) {
+            if (sent[i].name.equals(friend)) {
+                for (int j = i; j &lt; count - 1; j++) sent[j] = sent[j + 1];   // shift left
+                sent[count - 1] = null;
+                count--;
+                System.out.println(&quot;Reuqest to add &quot; + friend + &quot; is removed for &quot; + name + &quot;.&quot;);
+                return;
+            }
+        }
+        System.out.println(friend + &quot; is not in &quot; + name + &quot;&#x27;s sent request list.&quot;);
+    }
+
+    public void showDetails() {
+        System.out.println(&quot;User Name: &quot; + name);
+        System.out.println(&quot;Maximum number of Sent Friend Request: &quot; + limit);
+        System.out.println(&quot;Total Friends Request: &quot; + count);
+        String list = &quot;Sent Friends Request:&quot;;
+        for (int i = 0; i &lt; count; i++) list += &quot; &quot; + sent[i].name;
+        System.out.println(list);
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">Welcome to ConnectFriends, Sanaf
+=======1=======
+Welcome to ConnectFriends, Mantasha
+Welcome to ConnectFriends, Mostafiz
+Welcome to ConnectFriends, Matt
+=======2=======
+Sanaf sent a friend request to Mantasha.
+=======3=======
+Sanaf sent a friend request to Mostafiz.
+Sanaf has reached the friend request limit!
+=======4=======
+User Name: Sanaf
+Maximum number of Sent Friend Request: 2
+Total Friends Request: 2
+Sent Friends Request: Mantasha Mostafiz
+=======5=======
+Reuqest to add Mantasha is removed for Sanaf.
+=======6=======
+User Name: Sanaf
+Maximum number of Sent Friend Request: 2
+Total Friends Request: 1
+Sent Friends Request: Mostafiz
+=======7=======
+Murdock is not in Sanaf&#x27;s sent request list.
+=======8=======
+Matt is not in Sanaf&#x27;s sent request list.
+Reuqest to add Mostafiz is removed for Sanaf.
+User Name: Sanaf
+Maximum number of Sent Friend Request: 2
+Total Friends Request: 0
+Sent Friends Request:
+=======9=======
+User Name: Mantasha
+Maximum number of Sent Friend Request: 3
+Total Friends Request: 0
+Sent Friends Request:</pre></details></div>
+</article><article class="task" id="ug3">
+<h3>Task 3 — Cart (item transfer)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Cart-এ product রাখা, এক cart থেকে আরেক cart-এ item transfer, আর অনেকগুলো cart একসাথে দেখানো।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">Tester.java</div><pre class="java"><code>public class Tester{
+  public static void main(String args[]){
+    Cart c1 = new Cart();
+    Cart c2 = new Cart();
+    Cart c3 = new Cart();
+    Cart cartHub = new Cart();
+    c1.storeProduct(&quot;Pen&quot;, 10);
+    c2.storeProduct(&quot;Pencil&quot;, 15, &quot;Book&quot;, 100);
+    c2.storeProduct(&quot;Eraser&quot;, 5);
+    c3.storeProduct(&quot;Sharpener&quot;, 8);
+    System.out.println(&quot;1------------&quot;);
+    c1.info();
+    System.out.println(&quot;2------------&quot;);
+    c2.info();
+    System.out.println(&quot;3------------&quot;);
+    c1.transferItem(c2, &quot;Pen&quot;);
+    System.out.println(&quot;4------------&quot;);
+    c1.info();
+    System.out.println(&quot;5-----------&quot;);
+    c2.info();
+    System.out.println(&quot;6-----------&quot;);
+    cartHub.addCart(c1,c2,c3);
+    System.out.println(&quot;7-----------&quot;);
+    cartHub.allCartInfo();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li><code>transferItem(Cart other, String name)</code>: this cart থেকে item সরিয়ে (shift) <code>other.storeProduct(...)</code> দিয়ে অন্য cart-এ দেই। দুইটা object-ই বদলায়।</li>
+<li><code>addCart(c1, c2, c3)</code>: cartHub-এর ভেতরে অন্য Cart object-এর reference রাখে। <code>allCartInfo()</code> প্রতিটার <code>info()</code> call করে।</li>
+<li>Transfer-এর পরে c1 খালি, cartHub-এও c1 খালি দেখায়, কারণ একই object।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Cart.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Cart {
+    public String[] names = new String[10];
+    public int[] prices = new int[10];
+    public int count = 0;
+    public Cart[] carts = new Cart[3];
+    public int cartCount = 0;
+
+    public void storeProduct(String name, int price) {
+        names[count] = name;
+        prices[count] = price;
+        count++;
+    }
+
+    public void storeProduct(String n1, int p1, String n2, int p2) {
+        storeProduct(n1, p1);
+        storeProduct(n2, p2);
+    }
+
+    public void info() {
+        System.out.println(&quot;Cart Items:&quot;);
+        if (count == 0) {
+            System.out.println(&quot;The cart is empty.&quot;);
+        }
+        for (int i = 0; i &lt; count; i++) {
+            System.out.println(names[i] + &quot; - &quot; + prices[i]);
+        }
+    }
+
+    // this cart থেকে item সরিয়ে other cart এ দেওয়া
+    public void transferItem(Cart other, String name) {
+        for (int i = 0; i &lt; count; i++) {
+            if (names[i].equals(name)) {
+                other.storeProduct(names[i], prices[i]);
+                for (int j = i; j &lt; count - 1; j++) {
+                    names[j] = names[j + 1];
+                    prices[j] = prices[j + 1];
+                }
+                count--;
+                System.out.println(&quot;Item transferred successfully.&quot;);
+                return;
+            }
+        }
+        System.out.println(&quot;Item not found.&quot;);
+    }
+
+    public void addCart(Cart a, Cart b, Cart c) {
+        carts[0] = a;
+        carts[1] = b;
+        carts[2] = c;
+        cartCount = 3;
+    }
+
+    public void allCartInfo() {
+        for (int i = 0; i &lt; cartCount; i++) {
+            carts[i].info();
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">1------------
+Cart Items:
+Pen - 10
+2------------
+Cart Items:
+Pencil - 15
+Book - 100
+Eraser - 5
+3------------
+Item transferred successfully.
+4------------
+Cart Items:
+The cart is empty.
+5-----------
+Cart Items:
+Pencil - 15
+Book - 100
+Eraser - 5
+Pen - 10
+6-----------
+7-----------
+Cart Items:
+The cart is empty.
+Cart Items:
+Pencil - 15
+Book - 100
+Eraser - 5
+Pen - 10
+Cart Items:
+Sharpener - 8</pre></details></div>
+</article><article class="task" id="ug4">
+<h3>Task 4 — Taxi & Passenger</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Taxi-তে Passenger object add করো আর passenger list দেখাও।</p>
+<details><summary>Driver code (দেওয়া আছে, change করা যাবে না)</summary><div class="codewrap"><div class="code-title">TaxiTester.java</div><pre class="java"><code>public class TaxiTester{
+  public static void main(String args []){
+    Taxi t1 = new Taxi(&quot;MX8190&quot;, &quot;Gulshan&quot;);
+    Passenger p1 = new Passenger(&quot;Ali&quot;, 20);
+    Passenger p2 = new Passenger(&quot;Mifta&quot;, 45);
+    Passenger p3 = new Passenger(&quot;Marzan&quot;, 32);
+    System.out.println(&quot;1------------&quot;);
+    t1.showTaxi();
+    System.out.println(&quot;2------------&quot;);
+    p1.info();
+    p2.info();
+    System.out.println(&quot;3------------&quot;);
+    t1.addPassenger(p1);
+    t1.addPassenger(p2);
+    t1.addPassenger(p3);
+    System.out.println(&quot;4------------&quot;);
+    t1.showTaxi();
+  }
+}</code></pre></div></details></div>
+<div class="blk e"><div class="blk-h">💡 হালকা explanation</div><ul><li>Taxi-তে <code>Passenger[] passengers</code>, multi-class।</li><li><code>addPassenger(Passenger p)</code> কিছু print করে না (section 3 খালি)।</li><li>List-এ <code>passengers[i].name + " " + passengers[i].age</code>।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution</div><div class="codewrap"><div class="code-title">Passenger.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Passenger {
+    public String name;
+    public int age;
+
+    public Passenger(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public void info() {
+        System.out.println(&quot;Name: &quot; + name);
+        System.out.println(&quot;Age: &quot; + age);
+    }
+}</code></pre></div><div class="codewrap"><div class="code-title">Taxi.java</div><button class="copy-btn">Copy</button><pre class="java"><code>public class Taxi {
+    public String number;
+    public String route;
+    public Passenger[] passengers = new Passenger[4];
+    public int count = 0;
+
+    public Taxi(String number, String route) {
+        this.number = number;
+        this.route = route;
+    }
+
+    public void addPassenger(Passenger p) {
+        if (count &lt; 4) {
+            passengers[count] = p;
+            count++;
+        } else {
+            System.out.println(&quot;Taxi is full!&quot;);
+        }
+    }
+
+    public void showTaxi() {
+        System.out.println(&quot;Taxi No: &quot; + number);
+        System.out.println(&quot;Route: &quot; + route);
+        System.out.println(&quot;Passenger List:&quot;);
+        for (int i = 0; i &lt; count; i++) {
+            System.out.println(passengers[i].name + &quot; &quot; + passengers[i].age);
+        }
+    }
+}</code></pre></div>
+<details><summary>Output (driver চালিয়ে verify করা)</summary><pre class="output">1------------
+Taxi No: MX8190
+Route: Gulshan
+Passenger List:
+2------------
+Name: Ali
+Age: 20
+Name: Mifta
+Age: 45
+3------------
+4------------
+Taxi No: MX8190
+Route: Gulshan
+Passenger List:
+Ali 20
+Mifta 45
+Marzan 32</pre></details></div>
+</article><article class="task" id="ug5">
+<h3>Task 5 — Tracing (class TracingX)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class TracingX আর TesterX দেওয়া আছে, output trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li><code>t1.y = t1.x = 5</code>: chained assignment।</li>
+<li>metA-এর ভেতরে নতুন object বানিয়ে তার উপর আবার metA call: অন্য object-এর উপর নিজের method।</li>
+<li><code>++x</code> line 10-এ: t2.x = 27 assign হওয়ার পরেও t2.metA-এর ভেতরে 28 হয়ে যায়।</li>
+<li>শেষ line: <code>t1.y + t1.x + " "</code> → int + int আগে যোগ।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="ug5"></div></div>
+</article><article class="task" id="ug6">
+<h3>Task 6 — Tracing (class TestX)</h3>
+<div class="blk q"><div class="blk-h">❓ Question</div><p>Class TestX আর tester12 দেওয়া আছে, output trace করো।</p></div>
+<div class="blk e"><div class="blk-h">💡 কী কী খেয়াল রাখতে হবে</div><ul><li><code>temp.modify(temp, num)</code>: method চলে <b>temp</b>-এর উপর, কিন্তু array হলো <b>tx-এর num</b>।</li>
+<li>i = i + 1 → temp.i বাড়ে, tx.i না।</li>
+<li>প্রতিটা নতুন TestX নিজের আলাদা num array পায়।</li>
+<li><code>!(…)</code>: false-কে true বানায়, তাই if branch চলে; <code>nums[3]</code>-এর else branch চলেই না।</li></ul></div>
+<div class="blk s"><div class="blk-h">✅ Solution: trace</div><div data-trace="ug6"></div></div>
+</article></section>
+
+
+<section id="lab">
+  <h2><span class="num">05</span> Tracing Lab: Lab 4</h2>
+  <p class="lead">Lab 4-এর ৫টা tracing problem এখানে <b>line by line</b> চালিয়ে দেখো। প্রতিটা step-এ: কোন line চলছে (হলুদ), call stack-এ কোন method-এর কোন local variable, heap-এ object/array-র field, আর console-এ কী print হলো। <span class="kbd">←</span> <span class="kbd">→</span> arrow key দিয়েও চালানো যায়।</p>
+  <div class="lab-bar">
+    <select id="labSel" aria-label="Problem"></select>
+    <button class="btn" id="labFirst" title="শুরু">⏮</button>
+    <button class="btn" id="labPrev">◀ Prev</button>
+    <button class="btn primary" id="labNext">Next ▶</button>
+    <button class="btn" id="labLast" title="শেষ">⏭</button>
+    <button class="btn" id="labNextOut" title="পরের print পর্যন্ত যাও">⏩ Next print</button>
+    <button class="btn" id="labPlay">⏵ Auto play</button>
+    <select id="labSpeed" aria-label="Speed"><option value="1800">Slow</option><option value="1100" selected>Normal</option><option value="500">Fast</option></select>
+    <span id="labCount"></span>
+    <input type="range" id="labRange" min="0" value="0">
+  </div>
+  <div id="labNote"></div>
+  <div class="lab-grid">
+    <div>
+      <div class="panel"><div class="panel-h">Class code</div><div class="numcode" id="labCls"></div></div>
+      <div class="panel" style="margin-top:14px"><div class="panel-h">Driver code (main)</div><div class="numcode" id="labDrv" style="max-height:200px"></div></div>
+    </div>
+    <div>
+      <div class="side-stack">
+        <div class="panel"><div class="panel-h">Call stack (frames)</div><div id="labStack"></div></div>
+        <div class="panel"><div class="panel-h">Heap (objects &amp; arrays)</div><div id="labHeap"></div></div>
+      </div>
+      <div class="panel" id="labOutWrap" style="margin-top:14px"><div class="panel-h">Console output <button class="btn" id="practiceHide" style="font-size:12px;padding:3px 10px;background:#26304a;color:#e8ecf3;border-color:#344058">🙈 Output লুকাও (practice)</button></div><div id="labOut"></div></div>
+      <div class="panel practice"><div class="panel-h">✍️ Practice: নিজের answer check করো</div>
+        <p class="tiny" style="margin:0 0 8px">আগে খাতায় trace করো, তারপর পুরো output এখানে লেখো (প্রতি line-এ একটা print)।</p>
+        <textarea id="practiceIn" placeholder="প্রতি line-এ একটা print, যেমন:&#10;1 2 3&#10;4 5 6"></textarea>
+        <div style="margin-top:8px"><button class="btn primary" id="practiceBtn">Check answer</button></div>
+        <div id="practiceRes"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+<footer>CSE111 Lab Assignment 04 (Fall 26) · Study guide · সব code Java দিয়ে compile ও run করে verify করা</footer>
+<script>
+// ===== Lab 4 tracing data: every step = one line executed =====
+const PROBS = {
+cw5: {
+  title: "Classwork Task 5 (class Trace + Tester5)",
+  alias: {"Trace#1":"t1","Trace#2":"t2"},
+  cls: `public class Trace{
+  public int x, y = 5, temp = -4, sum = 3;
+  public Trace(){
+    y = temp + 3 ;
+    sum = 3 + temp + 2;
+    temp -= 2;
+  }
+  public Trace(Trace t){
+    sum = t.sum++;
+    x = t.x + 2;
+    t.methodB(2,3);
+  }
+  public void methodA(int m, int n){
+    int x = 2;
+    y = y + m + (temp++);
+    x = x + 5 + n;
+    sum = sum + x + y;
+    System.out.println(x+ " " +y+ " " +sum);
+  }
+  public void methodB(int m, int n){
+    int y = 0;
+    y = y + this.y;
+    x = this.y + 2 + temp;
+    methodA(x, y);
+    sum = x + y + sum;
+    System.out.println(x+ " " +y+ " " +sum);
+  }
+}`,
+  drv: `public class Tester5 {
+  public static void main(String args []){
+    Trace t1 = new Trace();
+    Trace t2 = new Trace(t1);
+    t1.methodA(1, 2);
+    t2.methodB(3, 2);
+  }
+}`,
+  steps: [
+  {d:3, heap:{"Trace#1":{obj:{x:0,y:5,temp:-4,sum:3}}}, push:{name:"Trace()  [t1]",vars:{this:"→Trace#1"}}, n:"<code>new Trace()</code>: no-arg constructor। Body চলার আগে field গুলো বসে যায়: x = 0 (default), y = 5, temp = -4, sum = 3।"},
+  {l:4, set:{"Trace#1.y":-1}, n:"y = temp + 3 = -4 + 3 = <b>-1</b>"},
+  {l:5, set:{"Trace#1.sum":1}, n:"sum = 3 + (-4) + 2 = <b>1</b>"},
+  {l:6, set:{"Trace#1.temp":-6}, n:"temp -= 2 → <b>-6</b>"},
+  {d:3, pop:1, set:{"$.t1":"→Trace#1"}, n:"Constructor শেষ। t1 = {x:0, y:-1, temp:-6, sum:1}"},
+  {d:4, heap:{"Trace#2":{obj:{x:0,y:5,temp:-4,sum:3}}}, push:{name:"Trace(Trace t)  [t2]",vars:{this:"→Trace#2",t:"→Trace#1"}}, n:"<code>new Trace(t1)</code>: argument একটা <b>Trace object</b>, তাই <b>Trace(Trace t)</b> constructor। <b>Reference pass:</b> t আর t1 এখন <b>একই object</b> কে point করে। t-এর মাধ্যমে কিছু বদলালে t1-ও বদলাবে।"},
+  {l:9, set:{"Trace#2.sum":1,"Trace#1.sum":2}, n:"<code>sum = t.sum++</code>: post-increment। পুরনো value <b>1</b> নতুন object-এর sum-এ যায়, তারপর t.sum (মানে t1.sum) বেড়ে <b>2</b> হয়।"},
+  {l:10, set:{"Trace#2.x":2}, n:"x = t.x + 2 = 0 + 2 = <b>2</b> (t2-এর x)"},
+  {l:11, push:{name:"methodB(int m, int n)  [t1]",vars:{this:"→Trace#1",m:2,n:3}}, n:"<code>t.methodB(2,3)</code>: method চলছে <b>t (= t1)</b> object-এর উপর, t2-এর উপর না! তাই এই method-এর ভেতরে <b>this = t1</b>।"},
+  {l:21, set:{"$.y":0}, n:"local y = 0"},
+  {l:22, set:{"$.y":-1}, n:"y = y + this.y = 0 + (-1) = <b>-1</b> (local)"},
+  {l:23, set:{"Trace#1.x":-5}, n:"x = this.y + 2 + temp = -1 + 2 + (-6) = <b>-5</b> (t1.x)"},
+  {l:24, push:{name:"methodA(int m, int n)  [t1]",vars:{this:"→Trace#1",m:-5,n:-1}}, n:"methodA(x, y) → methodA(-5, -1), এখনো t1-এর উপর।"},
+  {l:14, set:{"$.x":2}, n:"local x = 2"},
+  {l:15, set:{"Trace#1.y":-12,"Trace#1.temp":-5}, n:"<code>y = y + m + (temp++)</code> = -1 + (-5) + (-6) = <b>-12</b>। temp++ post: -6 ব্যবহার হলো, তারপর temp = <b>-5</b>।"},
+  {l:16, set:{"$.x":6}, n:"x = 2 + 5 + n(-1) = <b>6</b>"},
+  {l:17, set:{"Trace#1.sum":-4}, n:"sum = 2 + 6 + (-12) = <b>-4</b>"},
+  {l:18, out:"6 -12 -4", pop:1, n:"Print → <b>6 -12 -4</b>"},
+  {l:25, set:{"Trace#1.sum":-10}, n:"sum = x + y + sum = t1.x (-5) + local y (-1) + (-4) = <b>-10</b>"},
+  {l:26, out:"-5 -1 -10", pop:1, n:"Print → <b>-5 -1 -10</b>"},
+  {d:4, pop:1, set:{"$.t2":"→Trace#2"}, n:"Constructor শেষ। t2 = {x:2, y:5, temp:-4, sum:1}। আর t1 constructor-এর ভেতর থেকেই বদলে গেছে: t1 = {x:-5, y:-12, temp:-5, sum:-10}।"},
+  {d:5, push:{name:"methodA(int m, int n)  [t1]",vars:{this:"→Trace#1",m:1,n:2}}, n:"t1.methodA(1, 2)"},
+  {l:14, set:{"$.x":2}, n:"local x = 2"},
+  {l:15, set:{"Trace#1.y":-16,"Trace#1.temp":-4}, n:"y = -12 + 1 + (-5) = <b>-16</b>; temp → <b>-4</b>"},
+  {l:16, set:{"$.x":9}, n:"x = 2 + 5 + 2 = <b>9</b>"},
+  {l:17, set:{"Trace#1.sum":-17}, n:"sum = -10 + 9 + (-16) = <b>-17</b>"},
+  {l:18, out:"9 -16 -17", pop:1, n:"Print → <b>9 -16 -17</b>"},
+  {d:6, push:{name:"methodB(int m, int n)  [t2]",vars:{this:"→Trace#2",m:3,n:2}}, n:"t2.methodB(3, 2): এবার this = t2 = {x:2, y:5, temp:-4, sum:1}"},
+  {l:21, set:{"$.y":0}, n:"local y = 0"},
+  {l:22, set:{"$.y":5}, n:"y = 0 + this.y = <b>5</b>"},
+  {l:23, set:{"Trace#2.x":3}, n:"x = 5 + 2 + (-4) = <b>3</b>"},
+  {l:24, push:{name:"methodA(int m, int n)  [t2]",vars:{this:"→Trace#2",m:3,n:5}}, n:"methodA(3, 5)"},
+  {l:14, set:{"$.x":2}, n:"local x = 2"},
+  {l:15, set:{"Trace#2.y":4,"Trace#2.temp":-3}, n:"y = 5 + 3 + (-4) = <b>4</b>; temp → <b>-3</b>"},
+  {l:16, set:{"$.x":12}, n:"x = 2 + 5 + 5 = <b>12</b>"},
+  {l:17, set:{"Trace#2.sum":17}, n:"sum = 1 + 12 + 4 = <b>17</b>"},
+  {l:18, out:"12 4 17", pop:1, n:"Print → <b>12 4 17</b>"},
+  {l:25, set:{"Trace#2.sum":25}, n:"sum = x (3) + local y (5) + 17 = <b>25</b>"},
+  {l:26, out:"3 5 25", pop:1, n:"Print → <b>3 5 25</b>। Program শেষ! 🎉"}
+  ]
+},
+
+hw5: {
+  title: "Homework Task 5 (class QuizA + QuizTesterA)",
+  alias: {"QuizA#1":"q1","QuizA#2":"exam"},
+  cls: `public class QuizA {
+ public int x, y;
+ public int sum = 1;
+ public QuizA(int x, int y) {
+   this.x = y;
+   this.y = x;
+ }
+ public void methodA() {
+   int x = 3;
+   y = this.y + x;
+   QuizA exam = new QuizA(5, 11);
+   exam.sum = x;
+   exam.y = this.y;
+   x = this.x + x + exam.sum;
+   this.y = this.sum + methodB(exam.sum, exam);
+   System.out.println(exam.x + " " + this.y + " " + sum);
+   sum = x % 2 + this.x;
+   y = x + y + exam.sum;
+   System.out.println(x + " " + y + " " + sum);
+}
+public int methodB(int x1, QuizA x2) {
+   int y = 0;
+   y = this.y + x2.sum;
+   x2.sum = x1 + x2.x;
+   sum = sum + x + y;
+   System.out.println(this.x + " " + this.y + " " + sum);
+   return x2.sum;
+}
+}`,
+  drv: `public class QuizTesterA{
+  public static void main(String []args){
+    QuizA q1 = new QuizA(3,4);
+    q1.methodA();
+  }
+}`,
+  steps: [
+  {d:3, heap:{"QuizA#1":{obj:{x:0,y:0,sum:1}}}, push:{name:"QuizA(int x, int y)  [q1]",vars:{this:"→QuizA#1",x:3,y:4}}, n:"<code>new QuizA(3,4)</code>: parameter x = 3, y = 4। Field: x = 0, y = 0, sum = 1।"},
+  {l:5, set:{"QuizA#1.x":4}, n:"⚠️ <code>this.x = y</code>: field x-এ যায় parameter <b>y (4)</b>! উল্টো করে বসানো হচ্ছে।"},
+  {l:6, set:{"QuizA#1.y":3}, n:"this.y = x = <b>3</b>"},
+  {d:3, pop:1, set:{"$.q1":"→QuizA#1"}, n:"q1 = {x:4, y:3, sum:1}"},
+  {d:4, push:{name:"methodA()  [q1]",vars:{this:"→QuizA#1"}}, n:"q1.methodA()"},
+  {l:9, set:{"$.x":3}, n:"local x = 3"},
+  {l:10, set:{"QuizA#1.y":6}, n:"y = this.y + x = 3 + 3 = <b>6</b>"},
+  {l:11, heap:{"QuizA#2":{obj:{x:0,y:0,sum:1}}}, push:{name:"QuizA(int x, int y)  [exam]",vars:{this:"→QuizA#2",x:5,y:11}}, n:"<code>new QuizA(5, 11)</code>: method-এর ভেতরে একটা <b>নতুন object</b>।"},
+  {l:5, set:{"QuizA#2.x":11}, n:"exam.x = y = <b>11</b>"},
+  {l:6, set:{"QuizA#2.y":5}, n:"exam.y = x = <b>5</b>"},
+  {l:11, pop:1, set:{"$.exam":"→QuizA#2"}, n:"exam = {x:11, y:5, sum:1}"},
+  {l:12, set:{"QuizA#2.sum":3}, n:"exam.sum = x (local 3) = <b>3</b>"},
+  {l:13, set:{"QuizA#2.y":6}, n:"exam.y = this.y = <b>6</b>"},
+  {l:14, set:{"$.x":10}, n:"x = this.x + x + exam.sum = 4 + 3 + 3 = <b>10</b> (local)"},
+  {l:15, push:{name:"methodB(int x1, QuizA x2)  [q1]",vars:{this:"→QuizA#1",x1:3,x2:"→QuizA#2"}}, n:"<code>this.y = this.sum + methodB(exam.sum, exam)</code>: বাম থেকে ডানে, <b>this.sum (1) আগে পড়া হয়ে গেল</b>। তারপর methodB(3, exam)। <b>x2 পেল exam-এর reference</b>, মানে x2 আর exam একই object।"},
+  {l:22, set:{"$.y":0}, n:"local y = 0"},
+  {l:23, set:{"$.y":9}, n:"y = this.y + x2.sum = 6 + 3 = <b>9</b>"},
+  {l:24, set:{"QuizA#2.sum":14}, n:"<code>x2.sum = x1 + x2.x</code> = 3 + 11 = <b>14</b>। x2 আর exam একই object, তাই <b>exam.sum-ও 14</b> হয়ে গেল (reference pass-এর effect)!"},
+  {l:25, set:{"QuizA#1.sum":14}, n:"sum = sum + x + y = 1 + this.x (4) + local y (9) = <b>14</b> (q1-এর sum)"},
+  {l:26, out:"4 6 14", n:"Print this.x, this.y, sum → <b>4 6 14</b>"},
+  {l:27, pop:1, n:"return x2.sum = <b>14</b>"},
+  {l:15, set:{"QuizA#1.y":15}, n:"this.y = আগে পড়া 1 + 14 = <b>15</b>। (methodB-এর ভেতরে sum 14 হয়েছিল, কিন্তু পুরনো 1-টাই ব্যবহার হলো।)"},
+  {l:16, out:"11 15 14", n:"Print exam.x, this.y, sum → <b>11 15 14</b>"},
+  {l:17, set:{"QuizA#1.sum":4}, n:"sum = x % 2 + this.x = 10 % 2 + 4 = 0 + 4 = <b>4</b>"},
+  {l:18, set:{"QuizA#1.y":39}, n:"y = x + y + exam.sum = 10 + 15 + 14 = <b>39</b> (exam.sum এখন 14!)"},
+  {l:19, out:"10 39 4", pop:1, n:"Print → <b>10 39 4</b>। Program শেষ! 🎉"}
+  ]
+},
+
+hw6: {
+  title: "Homework Task 6 (class A + TesterA)",
+  alias: {"A#1":"a1","A#2":"a2"},
+  cls: `public class A {
+    public int x, y = 2, sum = 5;
+    public A(){
+        x = sum - y;
+        this.methodB(1);
+    }
+    public A(int x){
+        this.x = x;
+    }
+    public void methodB(int y) {
+        int temp = (y++) + (++this.y);
+        sum = y + temp - ++this.x;
+        System.out.println(y + " " + temp + " " + (sum++));
+        this.y = (++temp) + methodC(temp, y) + x;
+    }
+    public void methodA(int temp, int x) {
+        A a2 = new A(6);
+        a2.sum = this.methodC(a2);
+        System.out.println(this.x + " " + a2.sum + " " + y);
+        this.sum = a2.methodC(this);
+        System.out.println(a2.x + " " + this.sum + " " + a2.y);
+    }
+    public int methodC(A a) {
+        return this.x + a.y + a.sum;
+    }
+    public int methodC(int sum, int y) {
+        y = (this.x++) + sum + 3;
+        return y;
+    }
+}`,
+  drv: `public class TesterA{
+  public static void main(String [] args) {
+    A a1 = new A();
+    a1.methodA(4, 3);
+  }
+}`,
+  steps: [
+  {d:3, heap:{"A#1":{obj:{x:0,y:2,sum:5}}}, push:{name:"A()  [a1]",vars:{this:"→A#1"}}, n:"<code>new A()</code>: no-arg constructor। Field: x = 0, y = 2, sum = 5।"},
+  {l:4, set:{"A#1.x":3}, n:"x = sum - y = 5 - 2 = <b>3</b>"},
+  {l:5, push:{name:"methodB(int y)  [a1]",vars:{this:"→A#1",y:1}}, n:"Constructor-এর ভেতর থেকে <b>this.methodB(1)</b>।"},
+  {l:11, set:{"$.y":2,"A#1.y":3,"$.temp":4}, n:"<code>temp = (y++) + (++this.y)</code>: y++ → <b>1</b> ব্যবহার, পরে local y = 2। ++this.y → field y আগে <b>3</b> হয়, তারপর ব্যবহার। temp = 1 + 3 = <b>4</b>"},
+  {l:12, set:{"A#1.x":4,"A#1.sum":2}, n:"<code>sum = y + temp - ++this.x</code>: ++this.x → field x = <b>4</b>। sum = 2 + 4 - 4 = <b>2</b>"},
+  {l:13, out:"2 4 2", set:{"A#1.sum":3}, n:"Print y, temp, (sum++) → <b>2 4 2</b>। sum++ post: 2 print হলো, তারপর sum = <b>3</b>।"},
+  {l:14, set:{"$.temp":5}, push:{name:"methodC(int sum, int y)  [a1]",vars:{this:"→A#1",sum:5,y:2}}, n:"<code>this.y = (++temp) + methodC(temp, y) + x</code>: ++temp → <b>5</b>। তারপর methodC(5, 2), দুইটা int → <b>methodC(int, int)</b> version।"},
+  {l:27, set:{"$.y":12,"A#1.x":5}, n:"<code>y = (this.x++) + sum + 3</code>: this.x++ → <b>4</b> ব্যবহার, পরে field x = 5। y = 4 + 5 + 3 = <b>12</b> (sum এখানে parameter 5)"},
+  {l:28, pop:1, n:"return <b>12</b>"},
+  {l:14, set:{"A#1.y":22}, n:"this.y = 5 + 12 + <b>x</b>। ⚠️ x এখন <b>5</b>, কারণ methodC-এর ভেতরে x++ হয়ে গেছে, আর x শেষে পড়া হচ্ছে। this.y = 5 + 12 + 5 = <b>22</b>"},
+  {l:15, pop:1, n:"methodB শেষ।"},
+  {d:3, pop:1, set:{"$.a1":"→A#1"}, n:"Constructor শেষ। a1 = {x:5, y:22, sum:3}"},
+  {d:4, push:{name:"methodA(int temp, int x)  [a1]",vars:{this:"→A#1",temp:4,x:3}}, n:"a1.methodA(4, 3): parameter temp = 4, x = 3 (field x = 5 আলাদা)।"},
+  {l:17, heap:{"A#2":{obj:{x:0,y:2,sum:5}}}, push:{name:"A(int x)  [a2]",vars:{this:"→A#2",x:6}}, n:"<code>new A(6)</code>: <b>A(int x)</b> constructor। এটা methodB call করে না।"},
+  {l:8, set:{"A#2.x":6}, n:"this.x = <b>6</b>"},
+  {l:17, pop:1, set:{"$.a2":"→A#2"}, n:"a2 = {x:6, y:2, sum:5}"},
+  {l:18, push:{name:"methodC(A a)  [a1]",vars:{this:"→A#1",a:"→A#2"}}, n:"<code>this.methodC(a2)</code>: argument একটা A object → <b>methodC(A a)</b>। this = a1, a = a2।"},
+  {l:24, pop:1, n:"return this.x + a.y + a.sum = 5 + 2 + 5 = <b>12</b>"},
+  {l:18, set:{"A#2.sum":12}, n:"a2.sum = <b>12</b>"},
+  {l:19, out:"5 12 22", n:"Print this.x (5), a2.sum (12), y (field 22; methodA-তে y নামে parameter নেই) → <b>5 12 22</b>"},
+  {l:20, push:{name:"methodC(A a)  [a2]",vars:{this:"→A#2",a:"→A#1"}}, n:"<code>a2.methodC(this)</code>: এবার উল্টো! this (method-এর ভেতরে) = <b>a2</b>, আর a = <b>a1</b>।"},
+  {l:24, pop:1, n:"return this.x + a.y + a.sum = a2.x (6) + a1.y (22) + a1.sum (3) = <b>31</b>"},
+  {l:20, set:{"A#1.sum":31}, n:"a1.sum = <b>31</b>"},
+  {l:21, out:"6 31 2", pop:1, n:"Print a2.x, this.sum, a2.y → <b>6 31 2</b>। Program শেষ! 🎉"}
+  ]
+},
+
+ug5: {
+  title: "Ungraded Task 5 (class TracingX + TesterX)",
+  alias: {"TracingX#1":"t1","TracingX#2":"t2","TracingX#3":"t (inside t1.metA)","TracingX#4":"t (inside t2.metA)"},
+  cls: `public class TracingX {
+  public int x, y = 1;
+  public int metA(int y){
+      y += x + 3;
+      int temp = y + this.y;
+      if (temp % 2 == 0){
+          return temp;
+      }
+      TracingX t = new TracingX();
+      t.y = this.x - (++x) + t.x;
+      this.y = y + t.metA(t.x);
+      System.out.println(x +" "+ y +" "+temp);
+      return temp+this.y;
+  }
+}`,
+  drv: `public class TesterX {
+ public static void main(String[] args) {
+   TracingX t1 = new TracingX();
+   t1.y = t1.x = 5;
+   TracingX t2 = new TracingX();
+   t2.x = t1.metA(2);
+   t2.y = t2.metA(4);
+   System.out.println(t1.y +t1.x +" "+t2.x +" "+t2.y);
+ }
+}`,
+  steps: [
+  {d:3, heap:{"TracingX#1":{obj:{x:0,y:1}}}, set:{"$.t1":"→TracingX#1"}, n:"t1 = {x:0, y:1}"},
+  {d:4, set:{"TracingX#1.x":5,"TracingX#1.y":5}, n:"<code>t1.y = t1.x = 5</code>: chained assignment ডান থেকে বামে। আগে t1.x = 5, তারপর t1.y = 5।"},
+  {d:5, heap:{"TracingX#2":{obj:{x:0,y:1}}}, set:{"$.t2":"→TracingX#2"}, n:"t2 = {x:0, y:1}"},
+  {d:6, push:{name:"metA(int y)  [t1]",vars:{this:"→TracingX#1",y:2}}, n:"t1.metA(2): parameter y = 2 (field y = 5 আলাদা)।"},
+  {l:4, set:{"$.y":10}, n:"y += x + 3 → 2 + 5 + 3 = <b>10</b> (local)"},
+  {l:5, set:{"$.temp":15}, n:"temp = y + this.y = 10 + 5 = <b>15</b>"},
+  {l:6, n:"15 % 2 = 1, তাই condition <b>false</b>, return হলো না।"},
+  {l:9, heap:{"TracingX#3":{obj:{x:0,y:1}}}, set:{"$.t":"→TracingX#3"}, n:"নতুন object t = {x:0, y:1}"},
+  {l:10, set:{"TracingX#1.x":6,"TracingX#3.y":-1}, n:"<code>t.y = this.x - (++x) + t.x</code> = 5 - <b>6</b> + 0 = <b>-1</b>। ++x-এ t1.x = <b>6</b> হয়ে গেল।"},
+  {l:11, push:{name:"metA(int y)  [t]",vars:{this:"→TracingX#3",y:0}}, n:"<code>this.y = y + t.metA(t.x)</code>: y (10) আগে পড়া। তারপর t object-এর উপর metA(0), এটা <b>recursion</b>-এর মতো, কিন্তু অন্য object-এ।"},
+  {l:4, set:{"$.y":3}, n:"y = 0 + t.x (0) + 3 = <b>3</b>"},
+  {l:5, set:{"$.temp":2}, n:"temp = 3 + t.y (-1) = <b>2</b>"},
+  {l:7, pop:1, n:"2 % 2 == 0 → <b>return 2</b>"},
+  {l:11, set:{"TracingX#1.y":12}, n:"t1.y = 10 + 2 = <b>12</b>"},
+  {l:12, out:"6 10 15", n:"Print x (t1.x 6), y (local 10), temp (15) → <b>6 10 15</b>"},
+  {l:13, pop:1, n:"return temp + this.y = 15 + 12 = <b>27</b>"},
+  {d:6, set:{"TracingX#2.x":27}, n:"t2.x = <b>27</b>"},
+  {d:7, push:{name:"metA(int y)  [t2]",vars:{this:"→TracingX#2",y:4}}, n:"t2.metA(4): this = t2 = {x:27, y:1}"},
+  {l:4, set:{"$.y":34}, n:"y = 4 + 27 + 3 = <b>34</b>"},
+  {l:5, set:{"$.temp":35}, n:"temp = 34 + 1 = <b>35</b>"},
+  {l:6, n:"35 বিজোড় → condition false"},
+  {l:9, heap:{"TracingX#4":{obj:{x:0,y:1}}}, set:{"$.t":"→TracingX#4"}, n:"নতুন t = {x:0, y:1}"},
+  {l:10, set:{"TracingX#2.x":28,"TracingX#4.y":-1}, n:"t.y = 27 - <b>28</b> + 0 = <b>-1</b>। t2.x = <b>28</b> হয়ে গেল!"},
+  {l:11, push:{name:"metA(int y)  [t]",vars:{this:"→TracingX#4",y:0}}, n:"y (34) আগে পড়া; t.metA(0)"},
+  {l:4, set:{"$.y":3}, n:"y = 0 + 0 + 3 = 3"},
+  {l:5, set:{"$.temp":2}, n:"temp = 3 + (-1) = 2"},
+  {l:7, pop:1, n:"জোড় → <b>return 2</b>"},
+  {l:11, set:{"TracingX#2.y":36}, n:"t2.y = 34 + 2 = <b>36</b>"},
+  {l:12, out:"28 34 35", n:"Print → <b>28 34 35</b>"},
+  {l:13, pop:1, n:"return 35 + 36 = <b>71</b>"},
+  {d:7, set:{"TracingX#2.y":71}, n:"t2.y = <b>71</b>। (method-এর ভেতরে 36 করেছিল, কিন্তু return value দিয়ে overwrite।)"},
+  {d:8, out:"18 28 71", n:"⚠️ <code>t1.y + t1.x + \" \" + ...</code>: প্রথম দুইটা int, তাই আগে <b>যোগ</b>: 12 + 6 = <b>18</b>। তারপর String। t2.x এখন <b>28</b> (27 না! ++x-এ বেড়েছিল)। Output: <b>18 28 71</b> 🎉"}
+  ]
+},
+
+ug6: {
+  title: "Ungraded Task 6 (class TestX + tester12)",
+  alias: {"TestX#1":"tx","TestX#2":"temp","int[]#1":"tx.num","int[]#2":"data","int[]#3":"temp.num"},
+  cls: `public class TestX{
+  public int result = 17, i, n = 7, m = 5;
+  public int [] num = {6,8,11};
+  public void compute(int [] nums){
+    n = nums[0] + this.m;
+    this.result += nums[i];
+    TestX temp = new TestX();
+    boolean check = !(temp.modify(temp, num));
+    if (check) {
+      m = nums[1] + temp.result;
+    } else {
+      m = result - nums[3];
+    }
+    System.out.println(m + " " + n + " " + result);
+  }
+  public boolean modify(TestX obj, int[] arr){
+    arr[1]++;
+    i=i+1;
+    obj.m = this.result + arr[i];
+    obj.result = obj.m - obj.n + n;
+    System.out.println(obj.m + " " + obj.n + " " + result);
+    return arr[1] % 2 == 0;
+  }
+  public boolean modify(TestX obj){
+    num[i]++;
+    i=i+1;
+    obj.m = this.result + num[i];
+    obj.result = num[2] - obj.n + n;
+    System.out.println(obj.m + " " + obj.n + " " + result);
+    return num[1] % 2 != 0;
+  }
+}`,
+  drv: `public class tester12{
+  public static void main(String[] args){
+    TestX tx = new TestX();
+    int[] data = {4, 6, 2, 3, 5};
+    tx.compute(data);
+    tx.modify(tx);
+  }
+}`,
+  steps: [
+  {d:3, heap:{"TestX#1":{obj:{result:17,i:0,n:7,m:5,num:"→int[]#1"}},"int[]#1":{arr:[6,8,11]}}, set:{"$.tx":"→TestX#1"}, n:"tx: result = 17, i = 0 (default), n = 7, m = 5, num = {6, 8, 11}"},
+  {d:4, heap:{"int[]#2":{arr:[4,6,2,3,5]}}, set:{"$.data":"→int[]#2"}, n:"data = {4, 6, 2, 3, 5}"},
+  {d:5, push:{name:"compute(int[] nums)  [tx]",vars:{this:"→TestX#1",nums:"→int[]#2"}}, n:"tx.compute(data): nums আর data একই array।"},
+  {l:5, set:{"TestX#1.n":9}, n:"n = nums[0] + this.m = 4 + 5 = <b>9</b>"},
+  {l:6, set:{"TestX#1.result":21}, n:"result += nums[i] → i = 0 → 17 + 4 = <b>21</b>"},
+  {l:7, heap:{"TestX#2":{obj:{result:17,i:0,n:7,m:5,num:"→int[]#3"}},"int[]#3":{arr:[6,8,11]}}, set:{"$.temp":"→TestX#2"}, n:"নতুন object temp, নিজের আলাদা num array {6, 8, 11} সহ।"},
+  {l:8, push:{name:"modify(TestX obj, int[] arr)  [temp]",vars:{this:"→TestX#2",obj:"→TestX#2",arr:"→int[]#1"}}, n:"<code>temp.modify(temp, num)</code>: দুই argument → <b>modify(TestX, int[])</b>। খেয়াল করো: <b>num = tx-এর num</b> (compute চলছে tx-এর উপর), কিন্তু modify চলছে <b>temp</b>-এর উপর। তাই this = temp, obj = temp, arr = tx.num।"},
+  {l:17, set:{"int[]#1[1]":9}, n:"arr[1]++ → tx.num = {6, <b>9</b>, 11}"},
+  {l:18, set:{"TestX#2.i":1}, n:"i = i + 1: এখানে i = this.i = <b>temp.i</b> → <b>1</b> (tx.i এখনো 0)"},
+  {l:19, set:{"TestX#2.m":26}, n:"obj.m = this.result + arr[i] = 17 + arr[1] (9) = <b>26</b>"},
+  {l:20, set:{"TestX#2.result":26}, n:"obj.result = obj.m - obj.n + n = 26 - 7 + 7 = <b>26</b>"},
+  {l:21, out:"26 7 26", n:"Print obj.m, obj.n, result (temp.result) → <b>26 7 26</b>"},
+  {l:22, pop:1, n:"return arr[1] % 2 == 0 → 9 % 2 = 1 → <b>false</b>"},
+  {l:8, set:{"$.check":"true"}, n:"check = !false = <b>true</b>"},
+  {l:10, set:{"TestX#1.m":32}, n:"check true → m = nums[1] + temp.result = 6 + 26 = <b>32</b>। (nums[3] এর else branch চলে না।)"},
+  {l:14, out:"32 9 21", pop:1, n:"Print m, n, result → <b>32 9 21</b>"},
+  {d:6, push:{name:"modify(TestX obj)  [tx]",vars:{this:"→TestX#1",obj:"→TestX#1"}}, n:"<code>tx.modify(tx)</code>: এক argument → <b>modify(TestX)</b>। this = obj = tx।"},
+  {l:25, set:{"int[]#1[0]":7}, n:"num[i]++ → tx.i = 0 → num[0] = <b>7</b>। tx.num = {7, 9, 11}"},
+  {l:26, set:{"TestX#1.i":1}, n:"i = <b>1</b>"},
+  {l:27, set:{"TestX#1.m":30}, n:"obj.m = this.result + num[1] = 21 + 9 = <b>30</b>"},
+  {l:28, set:{"TestX#1.result":11}, n:"obj.result = num[2] - obj.n + n = 11 - 9 + 9 = <b>11</b>"},
+  {l:29, out:"30 9 11", n:"Print → <b>30 9 11</b>"},
+  {l:30, pop:1, n:"return 9 % 2 != 0 → true (main এটা ব্যবহার করে না)। Program শেষ! 🎉"}
+  ]
+}
+};
+
+</script>
+<script>
+// ================= Engine =================
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function computeStates(p){
+  let st = {frames:[{name:"main()", vars:{}}], heap:{}, out:[], changed:[]};
+  const states = [clone(st)];
+  p.steps.forEach(s => {
+    st = clone(st); const ch = [];
+    if (s.heap) for (const k in s.heap){ st.heap[k] = clone(s.heap[k]); ch.push("h:"+k); }
+    for (let i=0;i<(s.pop||0);i++) st.frames.pop();
+    (s.del||[]).forEach(k => delete st.heap[k]);
+    if (s.set) for (const k in s.set){
+      const v = s.set[k];
+      if (k.startsWith("$.")) { const fi = st.frames.length-1; st.frames[fi].vars[k.slice(2)] = v; ch.push("f"+fi+"."+k.slice(2)); }
+      else {
+        const m = k.match(/^(.+)\[(\d+)\]$/);
+        if (m) { st.heap[m[1]].arr[+m[2]] = v; ch.push("h:"+m[1]+"["+m[2]+"]"); }
+        else { const i = k.lastIndexOf("."); st.heap[k.slice(0,i)].obj[k.slice(i+1)] = v; ch.push("h:"+k); }
+      }
+    }
+    if (s.push){ st.frames.push(clone(s.push)); ch.push("frame"+(st.frames.length-1)); }
+    if (s.out !== undefined) st.out.push(s.out);
+    st.changed = ch; states.push(st);
+  });
+  return states;
+}
+if (typeof module !== "undefined") module.exports = {computeStates};
+if (typeof document === "undefined") { /* node test mode */ }
+else {
+
+// ================= Helpers =================
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const KW = /\b(public|private|protected|class|static|void|int|double|float|boolean|char|long|String|new|return|if|else|for|while|this|null|true|false)\b/;
+function hlJava(src){
+  const re = /(\/\/.*$)|("(?:\\.|[^"\\])*")|('(?:\\.|[^'\\])')|\b(public|private|protected|class|static|void|int|double|float|boolean|char|long|String|new|return|if|else|for|while|this|null|true|false)\b|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_]\w*(?=\s*\())/gm;
+  let out = "", last = 0, m;
+  while ((m = re.exec(src))){
+    out += esc(src.slice(last, m.index));
+    const t = esc(m[0]);
+    if (m[1]) out += `<span class="tk-c">${t}</span>`;
+    else if (m[2]||m[3]) out += `<span class="tk-s">${t}</span>`;
+    else if (m[4]) out += `<span class="tk-k">${t}</span>`;
+    else if (m[5]) out += `<span class="tk-n">${t}</span>`;
+    else if (m[6]) out += `<span class="tk-f">${t}</span>`;
+    last = m.index + m[0].length;
+  }
+  return out + esc(src.slice(last));
+}
+function lineCode(p, s){
+  const lines = s.l ? p.cls.split("\n") : p.drv.split("\n");
+  const n = s.l || s.d;
+  return (lines[n-1]||"").trim();
+}
+function al(p,k){ return (p.alias && p.alias[k]) ? p.alias[k] : k; }
+function showVal(p,v){ v = String(v); return v.startsWith("→") ? "→"+al(p, v.slice(1)) : v; }
+function changeText(p, s){
+  const parts = [];
+  if (s.heap) for (const k in s.heap){
+    const h = s.heap[k];
+    const body = h.arr ? "{"+h.arr.join(", ")+"}" : "{"+Object.entries(h.obj).map(([a,b])=>a+"="+showVal(p,b)).join(", ")+"}";
+    parts.push(`<span class="ch-new">new ${esc(al(p,k))}</span> ${esc(body)}`);
+  }
+  if (s.set) for (const k in s.set){
+    let label;
+    if (k.startsWith("$.")) label = `<span class="ch-loc">local</span> ${esc(k.slice(2))}`;
+    else { const m = k.match(/^(.+)\[(\d+)\]$/);
+      label = m ? `<span class="ch-fld">${esc(al(p,m[1]))}[${m[2]}]</span>` : `<span class="ch-fld">${esc(al(p,k.slice(0,k.lastIndexOf("."))))}.${esc(k.slice(k.lastIndexOf(".")+1))}</span>`; }
+    parts.push(`${label} = <b>${esc(showVal(p, s.set[k]))}</b>`);
+  }
+  if (s.push){
+    const args = Object.entries(s.push.vars).filter(([k])=>k!=="this").map(([k,v])=>k+"="+showVal(p,v)).join(", ");
+    parts.push(`<span class="ch-call">📞 ${esc(s.push.name.split("  ")[0])}</span>${args?" ("+esc(args)+")":""}`);
+  }
+  if (s.pop) parts.push(`<span class="ch-ret">↩ return</span>`);
+  return parts.join("<br>") || "—";
+}
+
+// ================= Static code highlighting =================
+document.querySelectorAll("pre.java code").forEach(c => { c.innerHTML = hlJava(c.textContent); });
+document.querySelectorAll(".copy-btn").forEach(b => b.addEventListener("click", () => {
+  const code = b.closest(".codewrap").querySelector("code").textContent;
+  navigator.clipboard && navigator.clipboard.writeText(code).then(()=>{ b.textContent="Copied ✓"; setTimeout(()=>b.textContent="Copy",1400); });
+}));
+
+// ================= Trace tables =================
+function numbered(src, tag){
+  return src.split("\n").map((ln,i)=>`<div class="ln" data-${tag}="${i+1}"><span class="no">${i+1}</span><span class="tx">${hlJava(ln)||" "}</span></div>`).join("");
+}
+document.querySelectorAll("[data-trace]").forEach(el => {
+  const id = el.dataset.trace, p = PROBS[id], states = computeStates(p);
+  const finalOut = states[states.length-1].out;
+  let rows = p.steps.map((s,i)=>`<tr>
+    <td class="c-n">${i+1}</td>
+    <td class="c-l">${s.l ? "L"+s.l : "main:"+s.d}</td>
+    <td class="c-code"><code>${hlJava(lineCode(p,s))}</code></td>
+    <td class="c-ch">${changeText(p,s)}</td>
+    <td class="c-o">${s.out!==undefined ? `<span class="outpill">${esc(s.out)}</span>` : ""}</td>
+    <td class="c-note">${s.n}</td></tr>`).join("");
+  const maxCols = Math.max(...finalOut.map(o=>o.split(" ").length));
+  const outGrid = finalOut.map(o=>{ const c=o.split(" "); return "<tr>"+Array.from({length:maxCols},(_,i)=>`<td>${esc(c[i]??"")}</td>`).join("")+"</tr>"; }).join("");
+  el.innerHTML = `
+   <div class="tracecode">
+     <div><div class="tc-h">Class code</div><div class="numcode">${numbered(p.cls,"l")}</div></div>
+     <div><div class="tc-h">Driver code (main)</div><div class="numcode">${numbered(p.drv,"d")}</div></div>
+   </div>
+   <h4>📋 Trace table (step by step)</h4>
+   <p class="hint">L = class-এর line number, main:n = driver code-এর line। "local" = method-এর ভেতরের variable, <span class="ch-fld">obj.field</span> = object-এর instance variable।</p>
+   <div class="tablewrap"><table class="trace"><thead><tr><th>#</th><th>Line</th><th>Code</th><th>Variable changes</th><th>Output</th><th>কী হচ্ছে (explanation)</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="final">
+     <div><h4>✅ Final Output (exam format)</h4><table class="outgrid">${outGrid}</table></div>
+     <div class="final-act"><button class="btn primary" onclick="openLab('${id}')">▶ Tracing Lab-এ step-by-step দেখো</button></div>
+   </div>`;
+});
+
+// ================= Tracing Lab =================
+const lab = { id:null, states:[], i:0, timer:null };
+const $ = s => document.querySelector(s);
+const sel = $("#labSel");
+Object.keys(PROBS).forEach(k => { const o = document.createElement("option"); o.value=k; o.textContent=PROBS[k].title; sel.appendChild(o); });
+sel.addEventListener("change", ()=> loadLab(sel.value));
+
+function loadLab(id){
+  stopPlay();
+  lab.id = id; const p = PROBS[id]; lab.states = computeStates(p); lab.i = 0;
+  sel.value = id;
+  $("#labCls").innerHTML = numbered(p.cls,"l");
+  $("#labDrv").innerHTML = numbered(p.drv,"d");
+  $("#labRange").max = p.steps.length; $("#labRange").value = 0;
+  $("#practiceIn").value = ""; $("#practiceRes").innerHTML = "";
+  renderLab();
+}
+function renderLab(){
+  const p = PROBS[lab.id], st = lab.states[lab.i], s = p.steps[lab.i-1];
+  $("#labCount").textContent = `Step ${lab.i} / ${p.steps.length}`;
+  $("#labRange").value = lab.i;
+  document.querySelectorAll("#labCls .ln, #labDrv .ln").forEach(x=>x.classList.remove("on"));
+  if (s){
+    const box = s.l ? $("#labCls") : $("#labDrv");
+    const ln = box.querySelector(`.ln[data-${s.l?"l":"d"}="${s.l||s.d}"]`);
+    if (ln){ ln.classList.add("on"); box.scrollTop = ln.offsetTop - box.clientHeight/2 + 12; }
+    $("#labNote").innerHTML = `<div class="note-line">${s.l?"Class line "+s.l:"main line "+s.d}: <code>${hlJava(lineCode(p,s))}</code></div><div>${s.n}</div>`;
+  } else {
+    $("#labNote").innerHTML = `<div>শুরু করতে <b>Next ▶</b> চাপো (বা keyboard-এর → arrow)। প্রতিটা step-এ দেখবে কোন line চলছে, কোন variable বদলাচ্ছে, আর কী print হচ্ছে।</div><div class="tiny">Tip: আগে নিজে খাতায় trace করো, তারপর এখানে মিলিয়ে নাও। নিচের "Practice" box-এ নিজের answer লিখে check করতে পারবে।</div>`;
+  }
+  // stack
+  const ch = new Set(st.changed);
+  $("#labStack").innerHTML = st.frames.map((f,fi)=>({f,fi})).reverse().map(({f,fi})=>`
+    <div class="frame ${fi===st.frames.length-1?"top":""} ${ch.has("frame"+fi)?"flash":""}">
+      <div class="fh">${esc(f.name)}${fi===st.frames.length-1?' <span class="badge">running</span>':""}</div>
+      ${Object.keys(f.vars).length? Object.entries(f.vars).map(([k,v])=>`<div class="vr ${ch.has("f"+fi+"."+k)?"flash":""}"><span>${esc(k)}</span><span>${esc(showVal(p,v))}</span></div>`).join("") : '<div class="vr empty">no local variables</div>'}
+    </div>`).join("");
+  // heap
+  const hk = Object.keys(st.heap);
+  $("#labHeap").innerHTML = hk.length ? hk.map(k=>{
+    const h = st.heap[k];
+    const name = p.alias && p.alias[k] ? `${esc(p.alias[k])} <span class="tiny">(${esc(k)})</span>` : esc(k);
+    if (h.arr) return `<div class="hobj ${ch.has("h:"+k)?"flash":""}"><div class="fh">${name}</div><div class="arr">${h.arr.map((v,i)=>`<div class="cell ${ch.has("h:"+k+"["+i+"]")?"flash":""}"><span class="idx">${i}</span>${esc(v)}</div>`).join("")}</div></div>`;
+    return `<div class="hobj ${ch.has("h:"+k)?"flash":""}"><div class="fh">${name}</div>${Object.entries(h.obj).map(([f,v])=>`<div class="vr ${ch.has("h:"+k+"."+f)?"flash":""}"><span>${esc(f)}</span><span>${esc(showVal(p,v))}</span></div>`).join("")}</div>`;
+  }).join("") : '<div class="vr empty">heap খালি</div>';
+  // output
+  $("#labOut").innerHTML = st.out.length ? st.out.map((o,i)=>`<div class="${(s&&s.out!==undefined&&i===st.out.length-1)?"newout":""}">${esc(o)}</div>`).join("") : '<div class="muted">// এখনো কিছু print হয়নি</div>';
+  $("#labPrev").disabled = lab.i===0; $("#labNext").disabled = lab.i===p.steps.length;
+}
+function go(n){ lab.i = Math.max(0, Math.min(PROBS[lab.id].steps.length, n)); renderLab(); }
+function stopPlay(){ if (lab.timer){ clearInterval(lab.timer); lab.timer=null; $("#labPlay").textContent="⏵ Auto play"; } }
+$("#labPrev").onclick = ()=>{ stopPlay(); go(lab.i-1); };
+$("#labNext").onclick = ()=>{ stopPlay(); go(lab.i+1); };
+$("#labFirst").onclick = ()=>{ stopPlay(); go(0); };
+$("#labLast").onclick = ()=>{ stopPlay(); go(PROBS[lab.id].steps.length); };
+$("#labRange").oninput = e => { stopPlay(); go(+e.target.value); };
+$("#labNextOut").onclick = ()=>{ stopPlay(); const st=PROBS[lab.id].steps; let j=lab.i; while(j<st.length){ j++; if(st[j-1].out!==undefined) break; } go(j); };
+$("#labPlay").onclick = ()=>{
+  if (lab.timer) return stopPlay();
+  if (lab.i===PROBS[lab.id].steps.length) go(0);
+  $("#labPlay").textContent = "⏸ Pause";
+  lab.timer = setInterval(()=>{ if (lab.i>=PROBS[lab.id].steps.length) return stopPlay(); go(lab.i+1); }, +$("#labSpeed").value);
+};
+document.addEventListener("keydown", e => {
+  if (["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName)) return;
+  const r = $("#lab").getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+  if (e.key==="ArrowRight"){ stopPlay(); go(lab.i+1); e.preventDefault(); }
+  if (e.key==="ArrowLeft"){ stopPlay(); go(lab.i-1); e.preventDefault(); }
+});
+$("#practiceBtn").onclick = ()=>{
+  const want = lab.states[lab.states.length-1].out;
+  const got = $("#practiceIn").value.split("\n").map(x=>x.trim().replace(/\s+/g," ")).filter(x=>x!=="");
+  let ok = 0;
+  const rows = want.map((w,i)=>{ const g = got[i] ?? ""; const good = g===w; if(good) ok++;
+    return `<tr class="${good?"ok":"bad"}"><td>${i+1}</td><td>${esc(g)||"<i>(empty)</i>"}</td><td>${good?"✔":"✘ → "+esc(w)}</td></tr>`; }).join("");
+  $("#practiceRes").innerHTML = `<div class="score">${ok}/${want.length} line সঠিক ${ok===want.length?"🎉 Perfect!":"— ভুলগুলো step-by-step চালিয়ে দেখো কোথায় মিস হলো।"}</div><table class="ptab"><tr><th>#</th><th>তোমার answer</th><th>Result</th></tr>${rows}</table>`;
+};
+$("#practiceHide").onclick = ()=>{ $("#labOutWrap").classList.toggle("hidden-out"); $("#practiceHide").textContent = $("#labOutWrap").classList.contains("hidden-out") ? "👁 Output দেখাও" : "🙈 Output লুকাও (practice)"; };
+window.openLab = id => { loadLab(id); $("#lab").scrollIntoView({behavior:"smooth"}); };
+loadLab("cw5");
+
+// nav active highlight
+const navLinks = [...document.querySelectorAll(".toc a")];
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ navLinks.forEach(a=>a.classList.toggle("act", a.getAttribute("href")==="#"+e.target.id)); } }), {rootMargin:"-40% 0px -55% 0px"});
+document.querySelectorAll("section[id], article[id]").forEach(s=>obs.observe(s));
+}
+
+</script>
+</body>
+</html>
